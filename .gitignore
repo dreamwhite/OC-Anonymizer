@@ -1,0 +1,7 @@
+.idea
+config.plist
+censored_config.plist
+venv
+catone.spec
+build
+dist
