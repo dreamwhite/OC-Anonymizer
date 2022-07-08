@@ -28,7 +28,7 @@ Changes the following Settings/Parameters in the **config.plist**:
 
 ## Instructions
 - Install [**Python**](https://www.python.org/) if you haven't already
-- Download [**OC Anonymizer**](https://github.com/5T33Z0/OC-Anonymizer/archive/refs/heads/master.zip) and unpack it
+- Click on "Code" > "Download ZIP" and upack it.
 - Copy/move the **OC-Anonymizer-master** folder to your Desktop
 - Start Terminal
 - Enter:</br>
