@@ -16,7 +16,6 @@ def load_plist() -> dict:
 class PlistStripper:
     def __init__(self):
         self.plist = load_plist()
-        print(self.plist['PlatformInfo']['Generic']['ROM'])
         self.reset_misc_boot()
         self.delete_misc_blessoverride()
         self.reset_misc_debug()
@@ -84,7 +83,6 @@ class PlistStripper:
                 print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
             except (Exception,):
                 print("An error occurred while trying to save the censored config.plist file!")
-
 
 if __name__ == '__main__':
     plist_stripper = PlistStripper()

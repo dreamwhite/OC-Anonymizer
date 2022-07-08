@@ -9,11 +9,11 @@ Python Script for removing sensitive data from OpenCore's `config.plist` before 
 
 Changes the following Settings/Parameters in the **config.plist**:
 
-- **SMBIOS** data:
-	- Deletes `PlatformInfo/Generic/MLB`
-	- Deletes `PlatformInfo/Generic/ROM`
-	- Deletes `PlatformInfo/Generic/SystemSerialNumber`
-	- Deletes `PlatformInfo/Generic/SystemUUID`
+- Anonymizes **SMBIOS** data in:
+	- `PlatformInfo/Generic/MLB`
+	- `PlatformInfo/Generic/ROM`
+	- `PlatformInfo/Generic/SystemSerialNumber`
+	- `PlatformInfo/Generic/SystemUUID`
 - **Security Settings**:
 	- `Misc/Security/ApECID` = `0`
 	- `Misc/Security/ScanPolicy` = `0`
