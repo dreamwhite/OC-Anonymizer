@@ -81,7 +81,7 @@ class PlistStripper:
         with open('censored_config.plist', 'wb') as f:
             try:
                 plistlib.dump(self.plist, f)
-                print(f"Successfully exported censored config.plist in {os.path.realpath(f.name)}")
+                print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
             except (Exception,):
                 print("An error occurred while trying to save the censored config.plist file!")
 

@@ -5,3 +5,4 @@ venv
 catone.spec
 build
 dist
+.DS_Store
