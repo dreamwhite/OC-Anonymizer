@@ -24,6 +24,7 @@ Changes the following Settings/Parameters in the **config.plist**:
 	- Deletes custom entries from `Misc/BlessOverride`
 	- Deletes custom boot loader entries from `Misc/Entries`
 	- Sets `Misc/Debug/Target` to `3` (Default)
+	- `UEFI/APFS`: Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility
 
 ## Instructions
 - Install [**Python**](https://www.python.org/) if you haven't already
