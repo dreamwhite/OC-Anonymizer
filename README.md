@@ -8,7 +8,7 @@ With this script you won't have any prob at all
 # Usage
 
 ```bash
-$> python3 catone.py PATH_TO_CONFIG.plist
+$> python3 oc_anonymizer.py PATH_TO_CONFIG.plist
 ```
 
 It'll create `censored_config.plist` with the stripped sensitive data
