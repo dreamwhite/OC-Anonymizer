@@ -52,7 +52,7 @@ class PlistStripper:
             -> Misc/Security/ApECID to 0 to disallow using personalised Apple Secure Boot identifiers (unsupported from
                 Monterey and later)
             -> Misc/Security/ScanPolicy = 0 to allow OpenCore's operating system detection policy
-            -> Misc/Security/SecureBootModel = Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip.
+            -> Misc/Security/SecureBootModel = Disabled. Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip.
             -> Misc/Security/Vault = Optional to disable OpenCore's vaulting mechanism
         """
 
