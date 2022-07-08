@@ -3,13 +3,13 @@
 # OC Anonymizer – remove sensitive Data from your config.plist
 
 ## About
-Python Script for removing sensitive data from OpenCore's `config.plist` before sharing your Config/EFI folder online. It also changes some settings to default, such as: ScanPolicy, Custom Entries, LauncherOptions, etc. See details below. Basically, it removes all those settings specific to your system and user preferences which may not be desireble to have on a different machine.
+Python Script for removing sensitive data from OpenCore's `config.plist`. Useful if you plan to share your Config/EFI online. Also resets some settings to default values which should not be carried over to a differnt system. Check the feature list for more details.
 
 ## Features
 
 Changes the following Settings/Parameters in the **config.plist**:
 
-- Anonymizes **SMBIOS** data in:
+- Anonymizes **SMBIOS** data for:
 	- `PlatformInfo/Generic/MLB`
 	- `PlatformInfo/Generic/ROM`
 	- `PlatformInfo/Generic/SystemSerialNumber`
@@ -17,12 +17,12 @@ Changes the following Settings/Parameters in the **config.plist**:
 - **Security Settings**:
 	- `Misc/Security/ApECID` = `0`
 	- `Misc/Security/ScanPolicy` = `0`
-	- `Misc/Security/SecureBootModel` = `Disabled` &rarr; Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip.
+	- `Misc/Security/SecureBootModel` = `Disabled` &rarr; :warning: Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable it in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip.
 	- `Misc/Security/Vault` = `Optional` 
 - **Other Settings**:
-	- Sets `Misc/Boot/LauncherOption` to `Disabled` &rarr; To avoid changing Boot Menu entries on the target system
-	- Deletes custom entries from `Misc/BlessOverride`
-	- Deletes custom boot loader entries from `Misc/Entries`
+	- Sets `Misc/Boot/LauncherOption` to `Disabled` &rarr; To avoid changing boot menu entries on the target system's Firmware/BIOS.
+	- Removes custom entries from `Misc/BlessOverride`
+	- Removes custom boot loader entries from `Misc/Entries`
 	- Sets `Misc/Debug/Target` to `3` (Default)
 	- `UEFI/APFS`: Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility
 
