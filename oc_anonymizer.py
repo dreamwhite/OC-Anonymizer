@@ -16,8 +16,8 @@ def load_plist() -> dict:
 class PlistStripper:
     def __init__(self):
         self.plist = load_plist()
-        self.reset_misc_boot()
         self.delete_misc_blessoverride()
+        self.reset_misc_boot()
         self.reset_misc_debug()
         self.delete_misc_entries()
         self.reset_misc_security()

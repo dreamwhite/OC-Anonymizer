@@ -1,6 +1,6 @@
 ![macOS](https://img.shields.io/badge/Supported_OC_build:-≥0.8.2-white.svg)
 
-# OC Anonymizer – remove sensitive Data from your config.plist
+# OC Anonymizer – remove sensitive data from your config.plist
 
 ## About
 Python Script for removing sensitive data from OpenCore's `config.plist` before sharing your Config/EFI folder online. It also changes some settings to default, such as: ScanPolicy, Custom Entries, LauncherOptions, etc. See details below. Basically, it removes all those settings specific to your system and user preferences which may not be desireble to have on a different machine.
