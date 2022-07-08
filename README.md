@@ -1,4 +1,4 @@
-# Catone, the OpenCore config.plist censor
+# OC Anyonymizer – remove sensitive Data from your OpenCore fonfig-plist
 
 The following script was created to censor sensitive fields in OpenCore's config.plist
 
