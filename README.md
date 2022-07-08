@@ -3,7 +3,7 @@
 # OC Anonymizer – remove sensitive Data from your config.plist
 
 ## About
-Python Script for removing sensitive Data from OpenCore's `config.plist` before sharing your Config/EFI folder online. It also changes some settings to default, such as: ScanPolicy, Custom Entries, LauncherOptions, etc. See details below. Basically it removes all those settings specific to your system and user preferences which may not be desireble to have on a different machine.
+Python Script for removing sensitive data from OpenCore's `config.plist` before sharing your Config/EFI folder online. It also changes some settings to default, such as: ScanPolicy, Custom Entries, LauncherOptions, etc. See details below. Basically, it removes all those settings specific to your system and user preferences which may not be desireble to have on a different machine.
 
 ## Features
 
