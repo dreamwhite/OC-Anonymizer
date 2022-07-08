@@ -1,4 +1,4 @@
-# OC Anyonymizer – remove sensitive Data from your config-plist
+# OC Anyonymizer – remove sensitive Data from your config.plist
 
 The following script was created to censor sensitive fields in OpenCore's config.plist
 
