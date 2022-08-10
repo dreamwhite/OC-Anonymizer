@@ -38,6 +38,10 @@ Changes the following Settings/Parameters in the **config.plist**:
 
 This will create a `censored_config.plist`in the oc_anonymizer folder without sensitive data and changed settings as described. 
 
+## Issues
+
+If you encounter any issue, please file a bugreport [here](https://github.com/dreamwhite/bugtracker/issues/new?assignees=dreamwhite&labels=bug&template=generic.md&title=)
+
 ## Credits and Resources
 
 - [Acidanthera](https://github.com/acidanthera) for [OpenCorePkg](https://github.com/acidanthera)
