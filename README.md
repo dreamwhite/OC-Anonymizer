@@ -32,7 +32,7 @@ Changes the following Settings/Parameters in the **config.plist**:
 
 ### Lite version
 
-The lite version of this script will only anonymize SMBIOS and APFS settings:
+The lite version of this script will only anonymize SMBIOS and change APFS settings:
 
 - Anonymizes entries in **PlatformInfo/Generic**:
 	- `PlatformInfo/Generic/MLB`
@@ -43,14 +43,13 @@ The lite version of this script will only anonymize SMBIOS and APFS settings:
 - Changes **APFS** settings: 
 	- `UEFI/APFS`: Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility. Otherwise the APFS driver isn't loaded in macOS 10.15 or older so you won't see any entries of APFS drives in OpenCore's Boot Menu. 
 
-
 ## Instructions
 - Install [**Python**](https://www.python.org/) if you haven't already
 - Click on "Code" > "Download ZIP" and upack it.
 - Run Terminal
 - Enter:</br>
 `cd ~/Downloads/OC-Anonymizer-master`
-- Next, enter </br>`python3 oc_anonymizer_full.py PATH_TO_CONFIG.plist` (or drag and drop your config into the terminal window after "".py")
+- Next, enter </br>`python3 oc_anonymizer_full.py PATH_TO_CONFIG.plist` (or drag and drop your config into the terminal window after ".py")
 - For running the Lite Version, enter enter </br>`python3 oc_anonymizer_lite.py PATH_TO_CONFIG.plist`
 - Hit `ENTER`
 
