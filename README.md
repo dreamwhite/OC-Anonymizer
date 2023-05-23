@@ -18,7 +18,7 @@ Changes the following Settings/Parameters in the **config.plist**:
 	- `PlatformInfo/Generic/SystemUUID`
 - **Security Settings**:
 	- `Misc/Security/ApECID` = `0` &rarr; ApECID has to be generated in the target system itself!
-	- `Misc/Security/ScanPolicy` = `0` &rarr; So the system sarchs all available volumes and file systems.
+	- `Misc/Security/ScanPolicy` = `0` &rarr; So the system checks for all supported device types and file systems.
 	- `Misc/Security/SecureBootModel` = `Disabled` &rarr; :warning: Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable it in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip!
 	- `Misc/Security/Vault` = `Optional` &rarr; Has to be created on the target system itself!
 - **Other Settings**:
@@ -45,7 +45,7 @@ The lite version of this script will only anonymize SMBIOS and change APFS setti
 
 ## Instructions
 - Install [**Python**](https://www.python.org/) if you haven't already
-- Click on "Code" > "Download ZIP" and upack it.
+- Click on "Code" > "Download ZIP" and unpack it.
 - Run Terminal
 - Enter:</br>
 `cd ~/Downloads/OC-Anonymizer-master`
@@ -57,7 +57,7 @@ This will create a `censored_config.plist`in the oc_anonymizer folder without se
 
 ## Issues
 
-If you encounter any issue, please file a bugreport [here](https://github.com/dreamwhite/bugtracker/issues/new?assignees=dreamwhite&labels=bug&template=generic.md&title=)
+If you encounter any issue, please file a bug report [here](https://github.com/dreamwhite/bugtracker/issues/new?assignees=dreamwhite&labels=bug&template=generic.md&title=)
 
 ## Credits and Resources
 
