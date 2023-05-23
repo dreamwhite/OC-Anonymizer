@@ -50,10 +50,10 @@ The lite version of this script will only anonymize SMBIOS and change APFS setti
 - Enter:</br>
 `cd ~/Downloads/OC-Anonymizer-master`
 - Next, enter </br>`python3 oc_anonymizer_full.py PATH_TO_CONFIG.plist` (or drag and drop your config into the terminal window after ".py")
-- For running the Lite Version, enter enter </br>`python3 oc_anonymizer_lite.py PATH_TO_CONFIG.plist`
+- For running the Lite Version, enter </br>`python3 oc_anonymizer_lite.py PATH_TO_CONFIG.plist`
 - Hit `ENTER`
 
-This will create a `censored_config.plist`in the oc_anonymizer folder without sensitive data and changed settings as described. Rename the file to config.plist and place it in the EFI folder you want to share with the worl
+This will create a `censored_config.plist`in the oc_anonymizer folder without sensitive data and changed settings as described. Rename the file to config.plist and place it in the EFI folder you want to share with the world.
 
 ## Issues
 
