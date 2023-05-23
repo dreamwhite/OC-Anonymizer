@@ -1,4 +1,4 @@
-![macOS](https://img.shields.io/badge/Supported_OC_build:-≥0.8.2-white.svg)
+![macOS](https://img.shields.io/badge/Supported_OC_version:-0.8.2+-white.svg)
 
 # OC Anonymizer – remove sensitive data from your config.plist
 
