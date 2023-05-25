@@ -23,6 +23,7 @@ class PlistStripper:
         self.reset_misc_security()
         self.delete_platforminfo_generic()
         self.disable_uefi_apfs()
+        self.disable_resizable_bar()
         self.dump()
 
     def reset_misc_boot(self) -> None:
@@ -69,10 +70,16 @@ class PlistStripper:
         self.plist['PlatformInfo']['Generic']['SystemUUID'] = 'XX-CHANGE_ME-XX'
 
     def disable_uefi_apfs(self) -> None:
-        """ Sets minimal allowed APFS driver date and version to permit any release date and version to load"""
+        """Disables minimal APFS driver version checks, so it can be loaded in macOS Catalina and older. Otherwise, APFS drives won't show in BootPicker."""
 
         self.plist['UEFI']['APFS']['MinDate'] = -1
         self.plist['UEFI']['APFS']['MinVersion'] = -1
+
+    def disable_resizable_bar(self) -> None:
+        """Disables Resizable BAR since you don't know if the next user's GPU suports it!"""
+        
+        self.plist['Booter']['Quirks']['ResizeAppleGpuBars'] = -1
+        self.plist['UEFI']['Quirks']['ResizeGpuBars'] = -1
 
     def dump(self):
         """Saves to a file the newly censored config.plist"""
@@ -83,6 +90,7 @@ class PlistStripper:
                 print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
             except (Exception,):
                 print("An error occurred while trying to save the censored config.plist file!")
+
 
 if __name__ == '__main__':
     plist_stripper = PlistStripper()
