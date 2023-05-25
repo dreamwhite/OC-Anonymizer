@@ -169,6 +169,8 @@ class PlistStripper:
                     'is_enabled': True  
                 }
         ]
+        self._print_welcome_banner()
+        self._print_options_menu()
         
         #TODO: convert the next line to a user input, so it can be dinamycally changed
         # self.plist = plistlib.load(open(sys.argv[1], 'rb'))
@@ -215,7 +217,7 @@ class PlistStripper:
         # TODO: When the user selects the desired policies to apply on the resulting "censored_config.plist", the enabled options should have a green foreground text, while the disabled one a red, or a white foreground text.
         # TODO: Do not delete any of the currently available settings (e.g. reset_misc_boot etc) because they'll be used when dumping the resulting "censored_config.plist"
 
-    def print_welcome_banner(self) -> None:
+    def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
         print("""
   ___    ___        ___                   _  _         _               
@@ -223,36 +225,69 @@ class PlistStripper:
 | (_) || (__       | - || ' \ / _ \| ' \  \_. || '  \ | ||_ // -_)| '_|
  \___/  \___|      |_|_||_||_|\___/|_||_| |__/ |_|_|_||_|/__|\___||_|  
 """)
-
-    def print_options_menu(self) -> None:
-
-        ...
-    
-    def grab_user_input(self) -> None:
-        ...
               
-    def reset_misc_boot(self) -> None:
+    
+    def _print_goodbye_banner(self) -> None:
+        ...
+
+    def _print_options_menu(self) -> None:
+        for rule in self.rules:
+            for key,value in rule.items():
+                print(f'[{"""#""" if rule["is_enabled"] else " "}] {self.rules.index(rule) + 1}.  {rule["name"]} - {rule["description"]}')
+                break
+
+    def _get_index_of_rule(self, rule: int):
+        return self.rules.index(rule)
+
+    def _grab_user_input(self) -> None:
+        while True:
+            user_input = input('Select an option: ')
+
+            #BUG: Thx to Python to only introduce in v3.10 match case syntax... I'll stick to the good old one if syntax...
+            #BUG: How tf am I supposed to identify the rule index among the other rules? 10:17 PM rn
+
+            if user_input == '1':
+                self.delete_misc_blessoverride()
+            if user_input == '2':
+                self.reset_misc_boot()
+            if user_input == '3':
+                self.reset_misc_debug()
+            if user_input == '4':
+                self.delete_misc_entries()
+            if user_input == '5':
+                self.reset_misc_security()
+            if user_input == '6':
+                self.delete_platforminfo_generic()
+            if user_input == '7':
+                self.disable_uefi_apfs()
+            if user_input == '8':
+                self.disable_resizable_bar_support()
+            if user_input == 'Q':
+                self._print_goodbye_banner()
+                sys.exit(0)
+              
+    def _reset_misc_boot(self) -> None:
         """ Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware
         preferences for persistence"""
 
         self.plist['Misc']['Boot']['LauncherOption'] = 'Disabled'
 
-    def delete_misc_blessoverride(self) -> None:
+    def _delete_misc_blessoverride(self) -> None:
         """ Deletes custom BlessOverride entries from config.plist"""
 
         self.plist['Misc']['BlessOverride'] = []
 
-    def reset_misc_debug(self) -> None:
+    def _reset_misc_debug(self) -> None:
         """ Sets Misc/Debug/Target to 3"""
 
         self.plist['Misc']['Debug']['Target'] = 3
 
-    def delete_misc_entries(self) -> None:
+    def _delete_misc_entries(self) -> None:
         """ Deletes custom bootloader entries from config.plist"""
 
         self.plist['Misc']['Entries'] = []
 
-    def reset_misc_security(self) -> None:
+    def _reset_misc_security(self) -> None:
         """Sets
             -> Misc/Security/ApECID to 0 to disallow using personalised Apple Secure Boot identifiers (unsupported from
                 Monterey and later)
@@ -266,7 +301,7 @@ class PlistStripper:
         self.plist['Misc']['Security']['SecureBootModel'] = 'Disabled'
         self.plist['Misc']['Security']['Vault'] = 'Optional'
 
-    def delete_platforminfo_generic(self) -> None:
+    def _delete_platforminfo_generic(self) -> None:
         """Censors several SMBIOS identification fields"""
 
         self.plist['PlatformInfo']['Generic']['MLB'] = 'XX-CHANGE_ME-XX'
@@ -274,13 +309,13 @@ class PlistStripper:
         self.plist['PlatformInfo']['Generic']['SystemSerialNumber'] = 'XX-CHANGE_ME-XX'
         self.plist['PlatformInfo']['Generic']['SystemUUID'] = 'XX-CHANGE_ME-XX'
 
-    def disable_uefi_apfs(self) -> None:
+    def _disable_uefi_apfs(self) -> None:
         """ Sets minimal allowed APFS driver date and version to permit any release date and version to load"""
 
         self.plist['UEFI']['APFS']['MinDate'] = -1
         self.plist['UEFI']['APFS']['MinVersion'] = -1
 
-    def dump(self):
+    def _dump(self):
         """Saves to a file the newly censored config.plist"""
 
         with open('censored_config.plist', 'wb') as f:
