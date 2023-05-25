@@ -1,8 +1,10 @@
 #!/usr/bin/python3.10
 
+import datetime
 import os
 import plistlib
 import sys
+import time
 
 
 # def load_plist() -> dict:
@@ -171,7 +173,7 @@ class PlistStripper:
         ]
         self._print_welcome_banner()
         self._print_options_menu()
-        
+        self._grab_user_input()
         #TODO: convert the next line to a user input, so it can be dinamycally changed
         # self.plist = plistlib.load(open(sys.argv[1], 'rb'))
 
@@ -185,37 +187,11 @@ class PlistStripper:
         # self.disable_uefi_apfs()
         # self.dump()
 
-        # TODO: display a welcome banner
-        # TODO: display checkboxes like following
-        #           1. Delete Misc/BlessOverride settings
-        #           2. Reset Misc/Boot settings
-        #                 - Set LauncherOption to "Disabled"
-        #           3. Reset Misc/Debug settings
-        #                 - Set Target to 3
-        #           4. Delete Misc/Entries settings
-        #           5. Reset Misc/Security settings
-        #                 - Set ApECID to 0
-        #                 - Set ScanPolicy to 0
-        #                 - Set SecureBootModel to "Disabled"
-        #                 - Set Vault to "Optional"
-        #           6. Censor PlatformInfo/Generic settings
-        #                 - Set MLB to "M0000000000000001"
-        #                 - Set ROM to b'\x11"3DUf'
-        #                 - Set SystemSerialNumber to "W00000000001"
-        #                 - Set SystemUUID to "00000000-0000-0000-0000-000000000000"
-        #           7. Reset UEFI/APFS settings
-        #                 - Set MinDate to -1
-        #                 - Set MinVersion to -1
-        #           8. Disable Resizable BAR Support
-        #                 - Set Booter/Quirks/ResizeAppleGpuBars to -1
-        #                 - Set UEFI/Quirks/ResizeGpuBars to -1
-        
         # TODO: create a shell-like behaviour where the user has to select the config.plist using S key, by dragging onto the terminal the desired config file.
         # BUG: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
         # BUG: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
         # BUG: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
         # TODO: When the user selects the desired policies to apply on the resulting "censored_config.plist", the enabled options should have a green foreground text, while the disabled one a red, or a white foreground text.
-        # TODO: Do not delete any of the currently available settings (e.g. reset_misc_boot etc) because they'll be used when dumping the resulting "censored_config.plist"
 
     def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
@@ -227,8 +203,30 @@ class PlistStripper:
 """)
               
     
-    def _print_goodbye_banner(self) -> None:
-        ...
+    def _quit_program(self) -> None:
+        self._clear_screen()
+        #Corp Hippity hoppity, your code is now my property haha
+        print('by dreamwhite\n')
+        print('Thanks for testing it out, for bugs/comments/complaints')
+        print('send me a message on Reddit, or check out my GitHub:\n')
+        print('www.reddit.com/u/dreamwhite')
+        print('www.github.com/dreamwhite\n')
+
+        hr = datetime.datetime.now().time().hour
+        if hr > 3 and hr < 12:
+            print('Have a nice morning!\n\n')
+        elif hr >= 12 and hr < 17:
+            print('Have a nice afternoon!\n\n')
+        elif hr >= 17 and hr < 21:
+            print('Have a nice evening!\n\n')
+        else:
+            print('Have a nice night!\n\n')
+        
+        time.sleep(3)
+        exit(0)
+
+    def _clear_screen(self) -> None:
+        os.system('cls' if os.name == 'nt' else 'clear')
 
     def _print_options_menu(self) -> None:
         for rule in self.rules:
@@ -236,18 +234,20 @@ class PlistStripper:
                 print(f'[{"""#""" if rule["is_enabled"] else " "}] {self.rules.index(rule) + 1}.  {rule["name"]} - {rule["description"]}')
                 break
 
-    def _get_index_of_rule(self, rule: int):
+    def _get_index_of_rule(self, rule: dict) -> int:
         return self.rules.index(rule)
 
+    def _grab_plist_file(self) -> None:
+        ...
     def _grab_user_input(self) -> None:
         while True:
             user_input = input('Select an option: ')
 
             #BUG: Thx to Python to only introduce in v3.10 match case syntax... I'll stick to the good old one if syntax...
-            #BUG: How tf am I supposed to identify the rule index among the other rules? 10:17 PM rn
-
+            #BUG: Find a  
             if user_input == '1':
-                self.delete_misc_blessoverride()
+                print(1)
+                # self.delete_misc_blessoverride()
             if user_input == '2':
                 self.reset_misc_boot()
             if user_input == '3':
@@ -262,9 +262,21 @@ class PlistStripper:
                 self.disable_uefi_apfs()
             if user_input == '8':
                 self.disable_resizable_bar_support()
-            if user_input == 'Q':
-                self._print_goodbye_banner()
-                sys.exit(0)
+            if user_input.lower() == 'q':
+                self._quit_program()
+
+            else:
+                print('Unknown option, retry!')
+                time.sleep(0.5)
+                self._clear_screen()
+                self._print_welcome_banner()
+                self._print_options_menu()
+                continue
+            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
+            self._clear_screen()
+            self._print_welcome_banner()
+            self._print_options_menu()
+            
               
     def _reset_misc_boot(self) -> None:
         """ Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware
