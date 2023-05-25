@@ -15,7 +15,164 @@ import sys
 
 class PlistStripper:
     def __init__(self):
-        self.plist = plistlib.load(open(sys.argv[1], 'rb'))
+        self.rules = [
+                {
+                    'name': 'Delete Misc/BlessOverride settings',
+                    'description': 'Add custom scanning paths through the bless model',
+                    'fields': [
+                        {
+                            'name': 'BlessOverride',
+                            'field_type': list,
+                            'field_value': [],
+                            'path': 'Misc/BlessOverride',
+                        }
+                    ],
+                    'is_enabled': True
+                },
+                {
+                    'name': 'Reset Misc Boot settings',
+                    'description': 'Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware preferences for persistence',
+                    'fields': [
+                        {
+                            'name': 'LauncherOption',
+                            'field_type': str,
+                            'field_value': 'Disabled',
+                            'path': 'Misc/Boot'
+                        },
+                    ],
+                    'is_enabled': True
+                },
+                {
+                    'name': 'Reset Misc Debug settings',
+                    'description': 'Sets Misc/Debug/Target to 3',
+                    'fields': [
+                        {
+                            'name': 'Target',
+                            'field_type': int,
+                            'field_value': 3,
+                            'path': 'Misc/Debug'
+                        },
+                    ],
+                    'is_enabled': True
+                },
+                {
+                    'name': 'Delete Misc/Entries settings',
+                    'description': 'Deletes custom bootloader entries from config.plist',
+                    'fields': [
+                        {
+                            'name': 'Entries',
+                            'field_type': list,
+                            'field_value': list(),
+                            'path': 'Misc/Entries'
+                        },
+                    ],
+                    'is_enabled': True  
+                },
+                {
+                    'name': 'Delete Misc/Security settings',
+                    'description': 'Various security settings to fix from config.plist',
+                    'fields': [
+                        {
+                            'name': 'ApECID',
+                            'field_type': int,
+                            'field_value': 0,
+                            'path': 'Misc/Security'
+                        },
+                        {
+                            'name': 'ScanPolicy',
+                            'field_type': int,
+                            'field_value': 0,
+                            'path': 'Misc/Security'
+                        },                        
+                        {
+                            'name': 'SecureBootModel',
+                            'field_type': str,
+                            'field_value': 'Disabled',
+                            'path': 'Misc/Security'
+                        },
+                        {
+                            'name': 'Vault',
+                            'field_type': str,
+                            'field_value': 'Optional',
+                            'path': 'Misc/Security'
+                        },
+                    ],
+                    'is_enabled': True  
+                },
+                {
+                    'name': 'Censor PlatformInfo settings',
+                    'description': 'Censors several SMBIOS identification fields',
+                    'fields': [
+                        {
+                            'name': 'MLB',
+                            'field_type': str,
+                            'field_value': 'M0000000000000001',
+                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
+                        },
+                        {
+                            'name': 'ROM',
+                            'field_type': bytes,
+                            'field_value': b'\x11"3DUf',
+                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
+                        },
+                        {
+                            'name': 'SystemSerialNumber',
+                            'field_type': str,
+                            'field_value': 'W00000000001',
+                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
+                        },
+                        {
+                            'name': 'SystemUUID',
+                            'field_type': str,
+                            'field_value': '00000000-0000-0000-0000-000000000000',
+                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
+                        },
+                    ],
+                    'is_enabled': True  
+                },
+                {
+                    'name': 'Change APFS settings',
+                    'description': 'Sets minimal allowed APFS driver date and version to permit any release date and version to load',
+                    'fields': [
+                        {
+                            'name': 'MinDate',
+                            'field_type': int,
+                            'field_value': -1,
+                            'path': 'UEFI/APFS'
+                        },
+                        {
+                            'name': 'MinVersion',
+                            'field_type': int,
+                            'field_value': -1,
+                            'path': 'UEFI/APFS'
+                        },
+                    ],
+                    'is_enabled': True  
+                },
+                {
+                    'name': 'Disable Resizable BAR Support',
+                    'description': 'Sets two quirks in config.plist to disable Resizable BAR support if it\' disabled in system firmware settings',
+                    'fields': [
+                        {
+                            'name': 'ResizeAppleGpuBars',
+                            'field_type': int,
+                            'field_value': -1,
+                            'path': 'Booter/Quirks'
+                        },
+                        {
+                            'name': 'ResizeGpuBars',
+                            'field_type': int,
+                            'field_value': -1,
+                            'path': 'UEFI/Quirks'
+                        },
+                    ],
+                    'is_enabled': True  
+                }
+        ]
+        
+        #TODO: convert the next line to a user input, so it can be dinamycally changed
+        # self.plist = plistlib.load(open(sys.argv[1], 'rb'))
+
 
         # self.delete_misc_blessoverride()
         # self.reset_misc_boot()
@@ -58,6 +215,22 @@ class PlistStripper:
         # TODO: When the user selects the desired policies to apply on the resulting "censored_config.plist", the enabled options should have a green foreground text, while the disabled one a red, or a white foreground text.
         # TODO: Do not delete any of the currently available settings (e.g. reset_misc_boot etc) because they'll be used when dumping the resulting "censored_config.plist"
 
+    def print_welcome_banner(self) -> None:
+        """ Prints a welcome banner"""
+        print("""
+  ___    ___        ___                   _  _         _               
+ / _ \  / __|      /   \ _ _   ___  _ _  | || | _ __  (_) ___ ___  _ _ 
+| (_) || (__       | - || ' \ / _ \| ' \  \_. || '  \ | ||_ // -_)| '_|
+ \___/  \___|      |_|_||_||_|\___/|_||_| |__/ |_|_|_||_|/__|\___||_|  
+""")
+
+    def print_options_menu(self) -> None:
+
+        ...
+    
+    def grab_user_input(self) -> None:
+        ...
+              
     def reset_misc_boot(self) -> None:
         """ Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware
         preferences for persistence"""
