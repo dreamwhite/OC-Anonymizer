@@ -31,18 +31,18 @@ Changes the following Settings/Parameters in the **config.plist**:
 	- `UEFI/APFS`:  Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility. Otherwise the APFS driver isn't loaded in macOS 10.15 or older so you won't see any entries of APFS drives in OpenCore's Boot Menu.
 
 ### Lite version
-The lite version of this script will only anonymize SMBIOS and change APFS settings:
+The lite version of this script will only anonymize SMBIOS and change 2 other settings:
 
 - Anonymizes entries in **PlatformInfo/Generic**:
 	- `PlatformInfo/Generic/MLB`
 	- `PlatformInfo/Generic/ROM`
 	- `PlatformInfo/Generic/SystemSerialNumber`
 	- `PlatformInfo/Generic/SystemUUID`
+- **Other Settings**:
+	- `Misc/Security/ScanPolicy` = `0` &rarr; So the system checks for all supported device types and file systems.
+	- 	`UEFI/APFS`: Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility. Otherwise the APFS driver isn't loaded in macOS 10.15 or older so you won't see any entries of APFS drives in OpenCore's Boot Menu. 
 
-- Changes **APFS** settings: 
-	- `UEFI/APFS`: Changes `MinDate` and `MinVersion` to `-1` to maximize macOS compatibility. Otherwise the APFS driver isn't loaded in macOS 10.15 or older so you won't see any entries of APFS drives in OpenCore's Boot Menu. 
-
-## Instructions
+## Usage
 - Install [**Python**](https://www.python.org/) if you haven't already
 - Click on "Code" > "Download ZIP" and unpack it.
 - Run Terminal

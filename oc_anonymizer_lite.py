@@ -17,6 +17,7 @@ class PlistStripper:
     def __init__(self):
         self.plist = load_plist()
         self.delete_platforminfo_generic()
+        self.reset_misc_security()
         self.disable_uefi_apfs()
         self.dump()
 
@@ -27,6 +28,13 @@ class PlistStripper:
         self.plist['PlatformInfo']['Generic']['ROM'] = b'\x11"3DUf'
         self.plist['PlatformInfo']['Generic']['SystemSerialNumber'] = 'XX-CHANGE_ME-XX'
         self.plist['PlatformInfo']['Generic']['SystemUUID'] = 'XX-CHANGE_ME-XX'
+
+    def reset_misc_security(self) -> None:
+        """Sets
+            -> Misc/Security/ScanPolicy = 0 to allow OpenCore's operating system detection policy
+        """
+
+        self.plist['Misc']['Security']['ScanPolicy'] = 0
 
     def disable_uefi_apfs(self) -> None:
         """Disables minimal APFS driver version checks, so it can be loaded on macOS Catalina and older. Otherwise, APFS drives won't show in BootPicker."""
