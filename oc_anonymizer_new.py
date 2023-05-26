@@ -3,6 +3,7 @@
 import datetime
 import os
 import plistlib
+from pprint import pprint
 import sys
 import time
 
@@ -17,6 +18,8 @@ import time
 
 class PlistStripper:
     def __init__(self):
+        self.plist = plistlib.load(open('config.plist', 'rb')) #BUG: should be user defined by using D letter in the shell. Actually keeping it for testing purposes
+
         self.rules = [
                 {
                     'name': 'Delete Misc/BlessOverride settings',
@@ -228,6 +231,11 @@ class PlistStripper:
     def _clear_screen(self) -> None:
         os.system('cls' if os.name == 'nt' else 'clear')
 
+    def _init_sequence(self) -> None:
+            self._clear_screen()
+            self._print_welcome_banner()
+            self._print_options_menu()
+    
     def _print_options_menu(self) -> None:
         for rule in self.rules:
             for key,value in rule.items():
@@ -246,36 +254,30 @@ class PlistStripper:
             #BUG: Thx to Python to only introduce in v3.10 match case syntax... I'll stick to the good old one if syntax...
             #BUG: Find a  
             if user_input == '1':
-                print(1)
-                # self.delete_misc_blessoverride()
-            if user_input == '2':
-                self.reset_misc_boot()
-            if user_input == '3':
-                self.reset_misc_debug()
-            if user_input == '4':
-                self.delete_misc_entries()
-            if user_input == '5':
-                self.reset_misc_security()
-            if user_input == '6':
-                self.delete_platforminfo_generic()
-            if user_input == '7':
-                self.disable_uefi_apfs()
-            if user_input == '8':
-                self.disable_resizable_bar_support()
-            if user_input.lower() == 'q':
+                self._delete_misc_blessoverride()
+            elif user_input == '2':
+                self._reset_misc_boot()
+            elif user_input == '3':
+                self._reset_misc_debug()
+            elif user_input == '4':
+                self._delete_misc_entries()
+            elif user_input == '5':
+                self._reset_misc_security()
+            elif user_input == '6':
+                self._delete_platforminfo_generic()
+            elif user_input == '7':
+                self._disable_uefi_apfs()
+            elif user_input == '8':
+                self._disable_resizable_bar_support()
+            elif user_input.lower() == 'q':
                 self._quit_program()
-
             else:
                 print('Unknown option, retry!')
                 time.sleep(0.5)
-                self._clear_screen()
-                self._print_welcome_banner()
-                self._print_options_menu()
+                self._init_sequence()
                 continue
-            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
-            self._clear_screen()
-            self._print_welcome_banner()
-            self._print_options_menu()
+            self._init_sequence()
+            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: not changing the value when selecting another entry
             
               
     def _reset_misc_boot(self) -> None:
