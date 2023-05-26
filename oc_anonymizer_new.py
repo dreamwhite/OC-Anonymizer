@@ -7,18 +7,10 @@ from pprint import pprint
 import sys
 import time
 
-
-# def load_plist() -> dict:
-#     """ Loads .plist XML like file and returns the opened buffer
-
-#     :return: dict-like object of the loaded plist
-#     """
-#     return plistlib.load(open(sys.argv[1], 'rb'))
-
-
 class PlistStripper:
     def __init__(self):
         self.plist = plistlib.load(open('config.plist', 'rb')) #BUG: should be user defined by using D letter in the shell. Actually keeping it for testing purposes
+
 
         self.rules = [
                 {
@@ -177,18 +169,13 @@ class PlistStripper:
         self._print_welcome_banner()
         self._print_options_menu()
         self._grab_user_input()
+
+
         #TODO: convert the next line to a user input, so it can be dinamycally changed
         # self.plist = plistlib.load(open(sys.argv[1], 'rb'))
 
 
-        # self.delete_misc_blessoverride()
-        # self.reset_misc_boot()
-        # self.reset_misc_debug()
-        # self.delete_misc_entries()
-        # self.reset_misc_security()
-        # self.delete_platforminfo_generic()
-        # self.disable_uefi_apfs()
-        # self.dump()
+        # self.dump() options dumps the input config.plist, after applying the selected patches, onto a new censored_config.plist
 
         # TODO: create a shell-like behaviour where the user has to select the config.plist using S key, by dragging onto the terminal the desired config file.
         # BUG: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
@@ -237,6 +224,7 @@ class PlistStripper:
             self._print_options_menu()
     
     def _print_options_menu(self) -> None:
+        #TODO: Validate fields from config.plist, inside the _print_options_menu function, so unnecessary patches won't be applied again. Saves up more headache imho
         for rule in self.rules:
             for _,*_ in rule.items():
                 print(f'[{"""#""" if rule["is_enabled"] else " "}] {self.rules.index(rule) + 1}.  {rule["name"]} - {rule["description"]}')
@@ -247,12 +235,11 @@ class PlistStripper:
 
     def _grab_plist_file(self) -> None:
         ...
+
     def _grab_user_input(self) -> None:
         while True:
             user_input = input('Select an option: ')
 
-            #BUG: Thx to Python to only introduce in v3.10 match case syntax... I'll stick to the good old one if syntax...
-            #BUG: Find a  
             if user_input == '1':
                 self._delete_misc_blessoverride()
             elif user_input == '2':
