@@ -238,7 +238,7 @@ class PlistStripper:
     
     def _print_options_menu(self) -> None:
         for rule in self.rules:
-            for key,value in rule.items():
+            for _,*_ in rule.items():
                 print(f'[{"""#""" if rule["is_enabled"] else " "}] {self.rules.index(rule) + 1}.  {rule["name"]} - {rule["description"]}')
                 break
 
@@ -274,10 +274,9 @@ class PlistStripper:
             else:
                 print('Unknown option, retry!')
                 time.sleep(0.5)
-                self._init_sequence()
                 continue
+            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
             self._init_sequence()
-            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: not changing the value when selecting another entry
             
               
     def _reset_misc_boot(self) -> None:
