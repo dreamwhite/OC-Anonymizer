@@ -1,347 +1,20 @@
 #!/usr/bin/python3.10
 
 import datetime
+import json
 import os
 import plistlib
-from pprint import pprint
-import sys
 import time
 
 class PlistStripper:
     def __init__(self):
         self.plist = plistlib.load(open('config.plist', 'rb')) #BUG: should be user defined by using D letter in the shell. Actually keeping it for testing purposes
-
-
-        self.rules = [
-                {
-                    'name': 'Delete Misc/BlessOverride settings',
-                    'description': 'Add custom scanning paths through the bless model',
-                    'fields': [
-                        {
-                            'name': 'BlessOverride',
-                            'type': list,
-                            'values': [
-                                {
-                                    'name': 'Empty list',
-                                    'description': 'No custom scanning paths through the bless model',
-                                    'type': str,
-                                    'value': '',
-                                    'default': True
-                                }
-                            ],
-                            'path': 'Misc/BlessOverride',
-                        }
-                    ],
-                    'is_enabled': True
-                },
-                {
-                    'name': 'Reset Misc Boot settings',
-                    'description': 'Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware preferences for persistence',
-                    'fields': [
-                        {
-                            'name': 'LauncherOption',
-                            'type': str,
-                            'values': [
-                                {
-                                    'name': 'Disabled',
-                                    'description': 'Do not register the launcher option in the firmware preferences for persistence',
-                                    'type': str,
-                                    'value': 'Disabled',
-                                    'default': True
-                                },
-                                {
-                                    'name': 'Full',
-                                    'description': 'Create or update the top priority boot option in UEFI variable storage at bootloader startup',
-                                    'type': str,
-                                    'value': 'Full',
-                                },
-                                {
-                                    'name': 'Short',
-                                    'description': 'Create a short boot option instead of a complete one. Useful for Insyde H2O BIOS that are unable to manage full device paths',
-                                    'type': str,
-                                    'value': 'Short',
-                                },
-                                {
-                                    'name': 'System',
-                                    'description': 'Create no boot option but assume specified custom option is blessed. Useful when relying on ForceBooterSignature quirk',
-                                    'type': str,
-                                    'value': 'System',
-                                },
-                            ],
-                            'path': 'Misc/Boot'
-                        },
-                    ],
-                    'is_enabled': True
-                },
-                {
-                    'name': 'Reset Misc Debug settings',
-                    'description': 'Sets Misc/Debug/Target to 3',
-                    'fields': [
-                        {
-                            'name': 'Target',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': '3',
-                                    'description': 'Enable basic logging without writing to file',
-                                    'type': int,
-                                    'value': 3,
-                                    'default': True
-                                },
-                                {
-                                    'name': '67',
-                                    'description': 'Enable file logging by writing to opencore-YYYY-MM-DD-HHMMSS.txt',
-                                    'type': int,
-                                    'value': 67
-                                }
-                            ],
-                            'path': 'Misc/Debug'
-                        },
-                    ],
-                    'is_enabled': True
-                },
-                {
-                    'name': 'Delete Misc/Entries settings',
-                    'description': 'Deletes custom bootloader entries from config.plist',
-                    'fields': [
-                        {
-                            'name': 'Entries',
-                            'type': list,
-                            'values': list(),
-                            'path': 'Misc/Entries'
-                        },
-                    ],
-                    'is_enabled': True  
-                },
-                {
-                    'name': 'Delete Misc/Security settings',
-                    'description': 'Various security settings to fix from config.plist',
-                    'fields': [
-                        {
-                            'name': 'ApECID',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': '0',
-                                    'description': 'Do not use Apple Enclave Identifier',
-                                    'type': int,
-                                    'value': 0,
-                                    'default': 'True'
-                                }
-                            ],
-                            'path': 'Misc/Security'
-                        },
-                        {
-                            'name': 'ScanPolicy',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': '0',
-                                    'description': 'Use default OpenCore scanning rules (APFS, SATA, NVMe mainly)',
-                                    'type': int,
-                                    'value': 0,
-                                    'default': 'True'
-                                }
-                            ],
-                            'path': 'Misc/Security'
-                        },                        
-                        {
-                            'name': 'SecureBootModel',
-                            'type': str,
-                            'fields': [
-                                {
-                                    'name': 'SecureBootModel',
-                                    'type': str,
-                                    'values': [
-                                        {
-                                            'name': 'Disabled',
-                                            'description': 'No model, Secure Boot will be disabled',
-                                            'type': str,
-                                            'value': 'Disabled',
-                                            'default': True
-                                        },
-                                        {
-                                            'name': 'Default',
-                                            'description': 'Matching model for current SMBIOS',
-                                            'type': str,
-                                            'value': 'Default',
-                                        },
-                                    ],
-                                    'path': 'Misc/Security'
-                                }
-                            ]
-                        },
-                        {
-                            'name': 'Vault',
-                            'type': str,
-                            'values': [
-                                {
-                                    'name': 'Optional',
-                                    'description': 'No vault is enforced, insecure',
-                                    'type': str,
-                                    'value': 'Optional',
-                                    'default': True
-                                },
-                                {
-                                    'name': 'Basic',
-                                    'description': 'Require vault.plist file present in OC directory. This provides basic filesystem integrity verification and may protect from unintentional filesystem corruption',
-                                    'type': str,
-                                    'value': 'Basic',
-                                },
-                                {
-                                    'name': 'Secure',
-                                    'description': 'Require vault.sig signature file for vault.plist in OC directory. This includes Basic integrity checking but also attempts to build a trusted bootchain.',
-                                    'type': str,
-                                    'value': 'Secure',
-                                },
-
-                            ],
-                            'path': 'Misc/Security'
-                        },
-                    ],
-                    'is_enabled': True  
-                },
-                {
-                    'name': 'Censor PlatformInfo settings',
-                    'description': 'Censors several SMBIOS identification fields',
-                    'fields': [
-                        {
-                            'name': 'MLB',
-                            'type': str,
-                            'values': [
-                                {
-                                    'name': 'Generic MLB',
-                                    'description': 'Use a generic MLB for sharing purposes',
-                                    'type': str,
-                                    'value': 'M0000000000000001',
-                                    'default': True
-                                }
-                            ],
-                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
-                        },
-                        {
-                            'name': 'ROM',
-                            'type': bytes,
-                            'values': [
-                                {
-                                    'name': 'Generic ROM',
-                                    'description': 'Use a generic ROM for sharing purposes',
-                                    'type': bytes,
-                                    'value': b'\x11"3DUf',
-                                    'default': True
-                                }
-                            ],
-                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
-                        },
-                        {
-                            'name': 'SystemSerialNumber',
-                            'type': str,
-                            'values': [
-                                {
-                                    'name': 'Generic SystemSerialNumber',
-                                    'description': 'Use a generic SystemSerialNumber for sharing purposes',
-                                    'type': str,
-                                    'value': 'W00000000001',
-                                    'default': True
-                                }
-                            ],
-                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
-                        },
-                        {
-                            'name': 'SystemUUID',
-                            'type': str,
-                            'values': [
-                                {
-                                    'name': 'Generic SystemUUID',
-                                    'description': 'Use a generic SystemUUID for sharing purposes',
-                                    'type': str,
-                                    'value': '00000000-0000-0000-0000-000000000000',
-                                    'default': True
-                                }
-                            ],
-                            'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
-                        },
-                    ],
-                    'is_enabled': True  
-                },
-                {
-                    'name': 'Change APFS settings',
-                    'description': 'Sets minimal allowed APFS driver date and version to permit any release date and version to load',
-                    'fields': [
-                        {
-                            'name': 'MinDate',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': 'MinDate',
-                                    'description': 'Minimal allowed APFS driver date',
-                                    'type': int,
-                                    'value': -1,
-                                    'default': True
-                                }
-                            ],
-                            'path': 'UEFI/APFS'
-                        },
-                        {
-                            'name': 'MinVersion',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': 'MinDate',
-                                    'description': 'Minimal allowed APFS driver version',
-                                    'type': int,
-                                    'value': -1,
-                                    'default': True
-                                }
-                            ],
-                            'path': 'UEFI/APFS'
-                        },
-                    ],
-                    'is_enabled': True  
-                },
-                {
-                    'name': 'Disable Resizable BAR Support',
-                    'description': 'Sets two quirks in config.plist to disable Resizable BAR support if it\' disabled in system firmware settings',
-                    'fields': [
-                        {
-                            'name': 'ResizeAppleGpuBars',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': 'ResizeAppleGpuBars',
-                                    'description': 'Disable ResizeAppleGpuBars quirk',
-                                    'type': int,
-                                    'value': -1,
-                                    'default': True
-                                }
-                            ],
-                            'path': 'Booter/Quirks'
-                        },
-                        {
-                            'name': 'ResizeGpuBars',
-                            'type': int,
-                            'values': [
-                                {
-                                    'name': 'ResizeGpuBars',
-                                    'description': 'Disable custom GPU PCI BAR custom sizes',
-                                    'type': int,
-                                    'value': -1,
-                                    'default': True
-                                }
-                            ],
-                            'path': 'UEFI/Quirks'
-                        },
-                    ],
-                    'is_enabled': True  
-                }
-        ]
-        self._print_welcome_banner()
-        self._print_options_menu()
+        self.rules = json.load(open('rules.json', 'r'))
+        self.selected_config = True if self.plist else False
+        self._init_sequence()
         self._grab_user_input()
-
-
         #TODO: convert the next line to a user input, so it can be dinamycally changed
-        # self.plist = plistlib.load(open(sys.argv[1], 'rb'))
+        
 
 
         # self.dump() options dumps the input config.plist, after applying the selected patches, onto a new censored_config.plist
@@ -390,9 +63,10 @@ class PlistStripper:
     def _init_sequence(self) -> None:
             self._clear_screen()
             self._print_welcome_banner()
-            self._print_options_menu()
+            self._print_rules_menu()
+            self._print_other_menu_entries()
     
-    def _print_options_menu(self) -> None:
+    def _print_rules_menu(self) -> None:
         #TODO: Validate fields from config.plist, inside the _print_options_menu function, so unnecessary patches won't be applied again. Saves up more headache imho
         for rule in self.rules:
             for _,*_ in rule.items():
@@ -402,8 +76,50 @@ class PlistStripper:
     def _get_index_of_rule(self, rule: dict) -> int:
         return self.rules.index(rule)
 
+    def _print_other_menu_entries(self) -> None:
+        print('\n[ ] Q. Quit the program')
+        print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist')
+
+    def _apply_rule(self, rule: dict, plist: dict) -> dict:
+        new_config = plist.copy()  # oil
+        current_segment_value = new_config  # first memory reference
+
+        for field in rule.get('fields', []):
+            rule_path = field.get('path', '')
+
+            segments = rule_path.split('/')
+            last_segment = segments[-1]
+
+            for index, segment in enumerate(segments):
+                if index == len(segments) - 1:
+                    break  # stop just before we reach the destination to allow key access / mutation later on
+
+                current_segment_value = current_segment_value[segment]  # this should update the variable while keeping the reference
+
+            for value in field.get('values', []):
+                default = value.get('default', False)
+
+                if default:
+                    initial_value = current_segment_value.get(last_segment)
+                    new_value = value.get('value', '')
+
+                    initial_type = type(initial_value)
+                    new_type = type(new_value)
+
+                    if initial_value is not None:
+                        if initial_type == new_type:
+                            current_segment_value[last_segment] = new_value
+                        else:
+                            print(f'Type mismatch at {rule_path}; Expected {initial_type.__name__}, but got {new_type.__name__}')
+
+        return new_config
+    
     def _grab_plist_file(self) -> None:
-        ...
+        # Here I'll write the code for loading the plist file from a user input
+        # plist_path
+        # self.plist = plistlib.load(open(plist_path, 'rb'))
+        self.selected_config = True
+        self._init_sequence()
 
     def _grab_user_input(self) -> None:
         while True:
@@ -427,6 +143,8 @@ class PlistStripper:
                 self._disable_resizable_bar_support()
             elif user_input.lower() == 'q':
                 self._quit_program()
+            elif user_input.lower() == 's':
+                self._grab_plist_file()
             else:
                 print('Unknown option, retry!')
                 time.sleep(0.5)

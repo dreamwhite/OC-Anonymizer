@@ -1,322 +1,282 @@
+[{
+    "name": "Delete Misc/BlessOverride settings",
+    "description": "Add custom scanning paths through the bless model",
+    "fields": [
+    {
+        "name": "BlessOverride",
+        "values": [
+        {
+            "name": "Empty list",
+            "description": "No custom scanning paths through the bless model",
+            "value": "",
+            "default": true
+        }
+        ],
+        "path": "Misc/BlessOverride"
+    }
+    ],
+    "is_enabled": true
+},
 {
-  "Delete Misc/BlessOverride settings": {
-      "name": "Delete Misc/BlessOverride settings",
-      "description": "Add custom scanning paths through the bless model",
-      "fields": [
-      {
-          "name": "BlessOverride",
-          "type": "list",
-          "values": [
-          {
-              "name": "Empty list",
-              "description": "No custom scanning paths through the bless model",
-              "type": "str",
-              "value": "",
-              "default": true
-          }
-          ],
-          "path": "Misc/BlessOverride"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Reset Misc Boot settings": {
-      "name": "Reset Misc Boot settings",
-      "description": "Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware preferences for persistence",
-      "fields": [
-      {
-          "name": "LauncherOption",
-          "type": "str",
-          "values": [
-          {
-              "name": "Disabled",
-              "description": "Do not register the launcher option in the firmware preferences for persistence",
-              "type": "str",
-              "value": "Disabled",
-              "default": true
-          },
-          {
-              "name": "Full",
-              "description": "Create or update the top priority boot option in UEFI variable storage at bootloader startup",
-              "type": "str",
-              "value": "Full"
-          },
-          {
-              "name": "Short",
-              "description": "Create a short boot option instead of a complete one. Useful for Insyde H2O BIOS that are unable to manage full device paths",
-              "type": "str",
-              "value": "Short"
-          },
-          {
-              "name": "System",
-              "description": "Create no boot option but assume specified custom option is blessed. Useful when relying on ForceBooterSignature quirk",
-              "type": "str",
-              "value": "System"
-          }
-          ],
-          "path": "Misc/Boot"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Reset Misc Debug settings": {
-      "name": "Reset Misc Debug settings",
-      "description": "Sets Misc/Debug/Target to 3",
-      "fields": [
-      {
-          "name": "Target",
-          "type": "int",
-          "values": [
-          {
-              "name": "3",
-              "description": "Enable basic logging without writing to file",
-              "type": "int",
-              "value": 3,
-              "default": true
-          },
-          {
-              "name": "67",
-              "description": "Enable file logging by writing to opencore-YYYY-MM-DD-HHMMSS.txt",
-              "type": "int",
-              "value": 67
-          }
-          ],
-          "path": "Misc/Debug"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Delete Misc/Entries settings": {
-      "name": "Delete Misc/Entries settings",
-      "description": "Deletes custom bootloader entries from config.plist",
-      "fields": [
-      {
-          "name": "Entries",
-          "type": "list",
-          "values": [],
-          "path": "Misc/Entries"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Delete Misc/Security settings": {
-      "name": "Delete Misc/Security settings",
-      "description": "Various security settings to fix from config.plist",
-      "fields": [
-      {
-          "name": "ApECID",
-          "type": "int",
-          "values": [
-          {
-              "name": "0",
-              "description": "Do not use Apple Enclave Identifier",
-              "type": "int",
-              "value": 0,
-              "default": "true"
-          }
-          ],
-          "path": "Misc/Security"
-      },
-      {
-          "name": "ScanPolicy",
-          "type": "int",
-          "values": [
-          {
-              "name": "0",
-              "description": "Use default OpenCore scanning rules (APFS, SATA, NVMe mainly)",
-              "type": "int",
-              "value": 0,
-              "default": "true"
-          }
-          ],
-          "path": "Misc/Security"
-      },
-      {
-          "name": "SecureBootModel",
-          "type": "str",
-          "fields": [
-          {
-              "name": "SecureBootModel",
-              "type": "str",
-              "values": [
-              {
-                  "name": "Disabled",
-                  "description": "No model, Secure Boot will be disabled",
-                  "type": "str",
-                  "value": "Disabled",
-                  "default": true
-              },
-              {
-                  "name": "Default",
-                  "description": "Matching model for current SMBIOS",
-                  "type": "str",
-                  "value": "Default"
-              }
-              ],
-              "path": "Misc/Security"
-          }
-          ]
-      },
-      {
-          "name": "Vault",
-          "type": "str",
-          "values": [
-          {
-              "name": "Optional",
-              "description": "No vault is enforced, insecure",
-              "type": "str",
-              "value": "Optional",
-              "default": true
-          },
-          {
-              "name": "Basic",
-              "description": "Require vault.plist file present in OC directory. This provides basic filesystem integrity verification and may protect from unintentional filesystem corruption",
-              "type": "str",
-              "value": "Basic"
-          },
-          {
-              "name": "Secure",
-              "description": "Require vault.sig signature file for vault.plist in OC directory. This includes Basic integrity checking but also attempts to build a trusted bootchain.",
-              "type": "str",
-              "value": "Secure"
-          }
-          ],
-          "path": "Misc/Security"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Censor PlatformInfo settings": {
-      "name": "Censor PlatformInfo settings",
-      "description": "Censors several SMBIOS identification fields",
-      "fields": [
-      {
-          "name": "MLB",
-          "type": "str",
-          "values": [
-          {
-              "name": "Generic MLB",
-              "description": "Use a generic MLB for sharing purposes",
-              "type": "str",
-              "value": "M0000000000000001",
-              "default": true
-          }
-          ],
-          "path": "PlatformInfo/Generic"
-      },
-      {
-          "name": "ROM",
-          "type": "bytes",
-          "values": [
-          {
-              "name": "Generic ROM",
-              "description": "Use a generic ROM for sharing purposes",
-              "type": "bytes",
-              "value": "\\u0011\\\"3DUf",
-              "default": true
-          }
-          ],
-          "path": "PlatformInfo/Generic"
-      },
-      {
-          "name": "SystemSerialNumber",
-          "type": "str",
-          "values": [
-          {
-              "name": "Generic SystemSerialNumber",
-              "description": "Use a generic SystemSerialNumber for sharing purposes",
-              "type": "str",
-              "value": "W00000000001",
-              "default": true
-          }
-          ],
-          "path": "PlatformInfo/Generic"
-      },
-      {
-          "name": "SystemUUID",
-          "type": "str",
-          "values": [
-          {
-              "name": "Generic SystemUUID",
-              "description": "Use a generic SystemUUID for sharing purposes",
-              "type": "str",
-              "value": "00000000-0000-0000-0000-000000000000",
-              "default": true
-          }
-          ],
-          "path": "PlatformInfo/Generic"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Change APFS settings": {
-      "name": "Change APFS settings",
-      "description": "Sets minimal allowed APFS driver date and version to permit any release date and version to load",
-      "fields": [
-      {
-          "name": "MinDate",
-          "type": "int",
-          "values": [
-          {
-              "name": "MinDate",
-              "description": "Minimal allowed APFS driver date",
-              "type": "int",
-              "value": -1,
-              "default": true
-          }
-          ],
-          "path": "UEFI/APFS"
-      },
-      {
-          "name": "MinVersion",
-          "type": "int",
-          "values": [
-          {
-              "name": "MinDate",
-              "description": "Minimal allowed APFS driver version",
-              "type": "int",
-              "value": -1,
-              "default": true
-          }
-          ],
-          "path": "UEFI/APFS"
-      }
-      ],
-      "is_enabled": true
-  },
-  "Disable Resizable BAR Support": {
-      "name": "Disable Resizable BAR Support",
-      "description": "Sets two quirks in config.plist to disable Resizable BAR support if it\" disabled in system firmware settings",
-      "fields": [
-      {
-          "name": "ResizeAppleGpuBars",
-          "type": "int",
-          "values": [
-          {
-              "name": "ResizeAppleGpuBars",
-              "description": "Disable ResizeAppleGpuBars quirk",
-              "type": "int",
-              "value": -1,
-              "default": true
-          }
-          ],
-          "path": "Booter/Quirks"
-      },
-      {
-          "name": "ResizeGpuBars",
-          "type": "int",
-          "values": [
-          {
-              "name": "ResizeGpuBars",
-              "description": "Disable custom GPU PCI BAR custom sizes",
-              "type": "int",
-              "value": -1,
-              "default": true
-          }
-          ],
-          "path": "UEFI/Quirks"
-      }
-      ],
-      "is_enabled": true
-  }
+    "name": "Reset Misc Boot settings",
+    "description": "Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware preferences for persistence",
+    "fields": [
+    {
+        "name": "LauncherOption",
+        "values": [
+        {
+            "name": "Disabled",
+            "description": "Do not register the launcher option in the firmware preferences for persistence",
+            "value": "Disabled",
+            "default": true
+        },
+        {
+            "name": "Full",
+            "description": "Create or update the top priority boot option in UEFI variable storage at bootloader startup",
+            "value": "Full"
+        },
+        {
+            "name": "Short",
+            "description": "Create a short boot option instead of a complete one. Useful for Insyde H2O BIOS that are unable to manage full device paths",
+            "value": "Short"
+        },
+        {
+            "name": "System",
+            "description": "Create no boot option but assume specified custom option is blessed. Useful when relying on ForceBooterSignature quirk",
+            "value": "System"
+        }
+        ],
+        "path": "Misc/Boot"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Reset Misc Debug settings",
+    "description": "Sets Misc/Debug/Target to 3",
+    "fields": [
+    {
+        "name": "Target",
+        "values": [
+        {
+            "name": "3",
+            "description": "Enable basic logging without writing to file",
+            "value": 3,
+            "default": true
+        },
+        {
+            "name": "67",
+            "description": "Enable file logging by writing to opencore-YYYY-MM-DD-HHMMSS.txt",
+            "value": 67
+        }
+        ],
+        "path": "Misc/Debug"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Delete Misc/Entries settings",
+    "description": "Deletes custom bootloader entries from config.plist",
+    "fields": [
+    {
+        "name": "Entries",
+        "values": [],
+        "path": "Misc/Entries"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Delete Misc/Security settings",
+    "description": "Various security settings to fix from config.plist",
+    "fields": [
+    {
+        "name": "ApECID",
+        "values": [
+        {
+            "name": "0",
+            "description": "Do not use Apple Enclave Identifier",
+            "value": 0,
+            "default": "true"
+        }
+        ],
+        "path": "Misc/Security"
+    },
+    {
+        "name": "ScanPolicy",
+        "values": [
+        {
+            "name": "0",
+            "description": "Use default OpenCore scanning rules (APFS, SATA, NVMe mainly)",
+            "value": 0,
+            "default": "true"
+        }
+        ],
+        "path": "Misc/Security"
+    },
+    {
+        "name": "SecureBootModel",
+        "fields": [
+        {
+            "name": "SecureBootModel",
+            "values": [
+            {
+                "name": "Disabled",
+                "description": "No model, Secure Boot will be disabled",
+                "value": "Disabled",
+                "default": true
+            },
+            {
+                "name": "Default",
+                "description": "Matching model for current SMBIOS",
+                "value": "Default"
+            }
+            ],
+            "path": "Misc/Security"
+        }
+        ]
+    },
+    {
+        "name": "Vault",
+        "values": [
+        {
+            "name": "Optional",
+            "description": "No vault is enforced, insecure",
+            "value": "Optional",
+            "default": true
+        },
+        {
+            "name": "Basic",
+            "description": "Require vault.plist file present in OC directory. This provides basic filesystem integrity verification and may protect from unintentional filesystem corruption",
+            "value": "Basic"
+        },
+        {
+            "name": "Secure",
+            "description": "Require vault.sig signature file for vault.plist in OC directory. This includes Basic integrity checking but also attempts to build a trusted bootchain.",
+            "value": "Secure"
+        }
+        ],
+        "path": "Misc/Security"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Censor PlatformInfo settings",
+    "description": "Censors several SMBIOS identification fields",
+    "fields": [
+    {
+        "name": "MLB",
+        "values": [
+        {
+            "name": "Generic MLB",
+            "description": "Use a generic MLB for sharing purposes",
+            "value": "M0000000000000001",
+            "default": true
+        }
+        ],
+        "path": "PlatformInfo/Generic"
+    },
+    {
+        "name": "ROM",
+        "values": [
+        {
+            "name": "Generic ROM",
+            "description": "Use a generic ROM for sharing purposes",
+            "value": "\\u0011\\\"3DUf",
+            "default": true
+        }
+        ],
+        "path": "PlatformInfo/Generic"
+    },
+    {
+        "name": "SystemSerialNumber",
+        "values": [
+        {
+            "name": "Generic SystemSerialNumber",
+            "description": "Use a generic SystemSerialNumber for sharing purposes",
+            "value": "W00000000001",
+            "default": true
+        }
+        ],
+        "path": "PlatformInfo/Generic"
+    },
+    {
+        "name": "SystemUUID",
+        "values": [
+        {
+            "name": "Generic SystemUUID",
+            "description": "Use a generic SystemUUID for sharing purposes",
+            "value": "00000000-0000-0000-0000-000000000000",
+            "default": true
+        }
+        ],
+        "path": "PlatformInfo/Generic"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Change APFS settings",
+    "description": "Sets minimal allowed APFS driver date and version to permit any release date and version to load",
+    "fields": [
+    {
+        "name": "MinDate",
+        "values": [
+        {
+            "name": "MinDate",
+            "description": "Minimal allowed APFS driver date",
+            "value": -1,
+            "default": true
+        }
+        ],
+        "path": "UEFI/APFS"
+    },
+    {
+        "name": "MinVersion",
+        "values": [
+        {
+            "name": "MinDate",
+            "description": "Minimal allowed APFS driver version",
+            "value": -1,
+            "default": true
+        }
+        ],
+        "path": "UEFI/APFS"
+    }
+    ],
+    "is_enabled": true
+},
+{
+    "name": "Disable Resizable BAR Support",
+    "description": "Sets two quirks in config.plist to disable Resizable BAR support if it\" disabled in system firmware settings",
+    "fields": [
+    {
+        "name": "ResizeAppleGpuBars",
+        "values": [
+        {
+            "name": "ResizeAppleGpuBars",
+            "description": "Disable ResizeAppleGpuBars quirk",
+            "value": -1,
+            "default": true
+        }
+        ],
+        "path": "Booter/Quirks"
+    },
+    {
+        "name": "ResizeGpuBars",
+        "values": [
+        {
+            "name": "ResizeGpuBars",
+            "description": "Disable custom GPU PCI BAR custom sizes",
+            "value": -1,
+            "default": true
+        }
+        ],
+        "path": "UEFI/Quirks"
+    }
+    ],
+    "is_enabled": true
 }
+]
