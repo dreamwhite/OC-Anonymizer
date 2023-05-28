@@ -19,8 +19,16 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'BlessOverride',
-                            'field_type': list,
-                            'field_value': [],
+                            'type': list,
+                            'values': [
+                                {
+                                    'name': 'Empty list',
+                                    'description': 'No custom scanning paths through the bless model',
+                                    'type': str,
+                                    'value': '',
+                                    'default': True
+                                }
+                            ],
                             'path': 'Misc/BlessOverride',
                         }
                     ],
@@ -32,8 +40,34 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'LauncherOption',
-                            'field_type': str,
-                            'field_value': 'Disabled',
+                            'type': str,
+                            'values': [
+                                {
+                                    'name': 'Disabled',
+                                    'description': 'Do not register the launcher option in the firmware preferences for persistence',
+                                    'type': str,
+                                    'value': 'Disabled',
+                                    'default': True
+                                },
+                                {
+                                    'name': 'Full',
+                                    'description': 'Create or update the top priority boot option in UEFI variable storage at bootloader startup',
+                                    'type': str,
+                                    'value': 'Full',
+                                },
+                                {
+                                    'name': 'Short',
+                                    'description': 'Create a short boot option instead of a complete one. Useful for Insyde H2O BIOS that are unable to manage full device paths',
+                                    'type': str,
+                                    'value': 'Short',
+                                },
+                                {
+                                    'name': 'System',
+                                    'description': 'Create no boot option but assume specified custom option is blessed. Useful when relying on ForceBooterSignature quirk',
+                                    'type': str,
+                                    'value': 'System',
+                                },
+                            ],
                             'path': 'Misc/Boot'
                         },
                     ],
@@ -45,8 +79,22 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'Target',
-                            'field_type': int,
-                            'field_value': 3,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': '3',
+                                    'description': 'Enable basic logging without writing to file',
+                                    'type': int,
+                                    'value': 3,
+                                    'default': True
+                                },
+                                {
+                                    'name': '67',
+                                    'description': 'Enable file logging by writing to opencore-YYYY-MM-DD-HHMMSS.txt',
+                                    'type': int,
+                                    'value': 67
+                                }
+                            ],
                             'path': 'Misc/Debug'
                         },
                     ],
@@ -58,8 +106,8 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'Entries',
-                            'field_type': list,
-                            'field_value': list(),
+                            'type': list,
+                            'values': list(),
                             'path': 'Misc/Entries'
                         },
                     ],
@@ -71,26 +119,83 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'ApECID',
-                            'field_type': int,
-                            'field_value': 0,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': '0',
+                                    'description': 'Do not use Apple Enclave Identifier',
+                                    'type': int,
+                                    'value': 0,
+                                    'default': 'True'
+                                }
+                            ],
                             'path': 'Misc/Security'
                         },
                         {
                             'name': 'ScanPolicy',
-                            'field_type': int,
-                            'field_value': 0,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': '0',
+                                    'description': 'Use default OpenCore scanning rules (APFS, SATA, NVMe mainly)',
+                                    'type': int,
+                                    'value': 0,
+                                    'default': 'True'
+                                }
+                            ],
                             'path': 'Misc/Security'
                         },                        
                         {
                             'name': 'SecureBootModel',
-                            'field_type': str,
-                            'field_value': 'Disabled',
-                            'path': 'Misc/Security'
+                            'type': str,
+                            'fields': [
+                                {
+                                    'name': 'SecureBootModel',
+                                    'type': str,
+                                    'values': [
+                                        {
+                                            'name': 'Disabled',
+                                            'description': 'No model, Secure Boot will be disabled',
+                                            'type': str,
+                                            'value': 'Disabled',
+                                            'default': True
+                                        },
+                                        {
+                                            'name': 'Default',
+                                            'description': 'Matching model for current SMBIOS',
+                                            'type': str,
+                                            'value': 'Default',
+                                        },
+                                    ],
+                                    'path': 'Misc/Security'
+                                }
+                            ]
                         },
                         {
                             'name': 'Vault',
-                            'field_type': str,
-                            'field_value': 'Optional',
+                            'type': str,
+                            'values': [
+                                {
+                                    'name': 'Optional',
+                                    'description': 'No vault is enforced, insecure',
+                                    'type': str,
+                                    'value': 'Optional',
+                                    'default': True
+                                },
+                                {
+                                    'name': 'Basic',
+                                    'description': 'Require vault.plist file present in OC directory. This provides basic filesystem integrity verification and may protect from unintentional filesystem corruption',
+                                    'type': str,
+                                    'value': 'Basic',
+                                },
+                                {
+                                    'name': 'Secure',
+                                    'description': 'Require vault.sig signature file for vault.plist in OC directory. This includes Basic integrity checking but also attempts to build a trusted bootchain.',
+                                    'type': str,
+                                    'value': 'Secure',
+                                },
+
+                            ],
                             'path': 'Misc/Security'
                         },
                     ],
@@ -102,26 +207,58 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'MLB',
-                            'field_type': str,
-                            'field_value': 'M0000000000000001',
+                            'type': str,
+                            'values': [
+                                {
+                                    'name': 'Generic MLB',
+                                    'description': 'Use a generic MLB for sharing purposes',
+                                    'type': str,
+                                    'value': 'M0000000000000001',
+                                    'default': True
+                                }
+                            ],
                             'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
                         },
                         {
                             'name': 'ROM',
-                            'field_type': bytes,
-                            'field_value': b'\x11"3DUf',
+                            'type': bytes,
+                            'values': [
+                                {
+                                    'name': 'Generic ROM',
+                                    'description': 'Use a generic ROM for sharing purposes',
+                                    'type': bytes,
+                                    'value': b'\x11"3DUf',
+                                    'default': True
+                                }
+                            ],
                             'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
                         },
                         {
                             'name': 'SystemSerialNumber',
-                            'field_type': str,
-                            'field_value': 'W00000000001',
+                            'type': str,
+                            'values': [
+                                {
+                                    'name': 'Generic SystemSerialNumber',
+                                    'description': 'Use a generic SystemSerialNumber for sharing purposes',
+                                    'type': str,
+                                    'value': 'W00000000001',
+                                    'default': True
+                                }
+                            ],
                             'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
                         },
                         {
                             'name': 'SystemUUID',
-                            'field_type': str,
-                            'field_value': '00000000-0000-0000-0000-000000000000',
+                            'type': str,
+                            'values': [
+                                {
+                                    'name': 'Generic SystemUUID',
+                                    'description': 'Use a generic SystemUUID for sharing purposes',
+                                    'type': str,
+                                    'value': '00000000-0000-0000-0000-000000000000',
+                                    'default': True
+                                }
+                            ],
                             'path': 'PlatformInfo/Generic' #BUG: In case a user doesn't use Generic section of PlatformInfo, this doesn't work
                         },
                     ],
@@ -133,14 +270,30 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'MinDate',
-                            'field_type': int,
-                            'field_value': -1,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': 'MinDate',
+                                    'description': 'Minimal allowed APFS driver date',
+                                    'type': int,
+                                    'value': -1,
+                                    'default': True
+                                }
+                            ],
                             'path': 'UEFI/APFS'
                         },
                         {
                             'name': 'MinVersion',
-                            'field_type': int,
-                            'field_value': -1,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': 'MinDate',
+                                    'description': 'Minimal allowed APFS driver version',
+                                    'type': int,
+                                    'value': -1,
+                                    'default': True
+                                }
+                            ],
                             'path': 'UEFI/APFS'
                         },
                     ],
@@ -152,14 +305,30 @@ class PlistStripper:
                     'fields': [
                         {
                             'name': 'ResizeAppleGpuBars',
-                            'field_type': int,
-                            'field_value': -1,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': 'ResizeAppleGpuBars',
+                                    'description': 'Disable ResizeAppleGpuBars quirk',
+                                    'type': int,
+                                    'value': -1,
+                                    'default': True
+                                }
+                            ],
                             'path': 'Booter/Quirks'
                         },
                         {
                             'name': 'ResizeGpuBars',
-                            'field_type': int,
-                            'field_value': -1,
+                            'type': int,
+                            'values': [
+                                {
+                                    'name': 'ResizeGpuBars',
+                                    'description': 'Disable custom GPU PCI BAR custom sizes',
+                                    'type': int,
+                                    'value': -1,
+                                    'default': True
+                                }
+                            ],
                             'path': 'UEFI/Quirks'
                         },
                     ],
