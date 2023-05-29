@@ -3,12 +3,11 @@
     "description": "Add custom scanning paths through the bless model",
     "fields": [
     {
-        "name": "BlessOverride",
         "values": [
         {
             "name": "Empty list",
             "description": "No custom scanning paths through the bless model",
-            "value": "",
+            "value": [],
             "default": true
         }
         ],
@@ -22,7 +21,6 @@
     "description": "Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware preferences for persistence",
     "fields": [
     {
-        "name": "LauncherOption",
         "values": [
         {
             "name": "Disabled",
@@ -46,7 +44,7 @@
             "value": "System"
         }
         ],
-        "path": "Misc/Boot"
+        "path": "Misc/Boot/LauncherOption"
     }
     ],
     "is_enabled": true
@@ -56,7 +54,6 @@
     "description": "Sets Misc/Debug/Target to 3",
     "fields": [
     {
-        "name": "Target",
         "values": [
         {
             "name": "3",
@@ -70,7 +67,7 @@
             "value": 67
         }
         ],
-        "path": "Misc/Debug"
+        "path": "Misc/Debug/Target"
     }
     ],
     "is_enabled": true
@@ -92,7 +89,6 @@
     "description": "Various security settings to fix from config.plist",
     "fields": [
     {
-        "name": "ApECID",
         "values": [
         {
             "name": "0",
@@ -101,10 +97,9 @@
             "default": "true"
         }
         ],
-        "path": "Misc/Security"
+        "path": "Misc/Security/ApECID"
     },
     {
-        "name": "ScanPolicy",
         "values": [
         {
             "name": "0",
@@ -113,32 +108,25 @@
             "default": "true"
         }
         ],
-        "path": "Misc/Security"
+        "path": "Misc/Security/ScanPolicy"
     },
     {
-        "name": "SecureBootModel",
-        "fields": [
+        "values": [
         {
-            "name": "SecureBootModel",
-            "values": [
-            {
-                "name": "Disabled",
-                "description": "No model, Secure Boot will be disabled",
-                "value": "Disabled",
-                "default": true
-            },
-            {
-                "name": "Default",
-                "description": "Matching model for current SMBIOS",
-                "value": "Default"
-            }
-            ],
-            "path": "Misc/Security"
+            "name": "Disabled",
+            "description": "No model, Secure Boot will be disabled",
+            "value": "Disabled",
+            "default": true
+        },
+        {
+            "name": "Default",
+            "description": "Matching model for current SMBIOS",
+            "value": "Default"
         }
-        ]
+        ],
+        "path": "Misc/Security/SecureBootModel"
     },
     {
-        "name": "Vault",
         "values": [
         {
             "name": "Optional",
@@ -157,7 +145,7 @@
             "value": "Secure"
         }
         ],
-        "path": "Misc/Security"
+        "path": "Misc/Security/Vault"
     }
     ],
     "is_enabled": true
@@ -167,7 +155,6 @@
     "description": "Censors several SMBIOS identification fields",
     "fields": [
     {
-        "name": "MLB",
         "values": [
         {
             "name": "Generic MLB",
@@ -176,10 +163,9 @@
             "default": true
         }
         ],
-        "path": "PlatformInfo/Generic"
+        "path": "PlatformInfo/Generic/MLB"
     },
     {
-        "name": "ROM",
         "values": [
         {
             "name": "Generic ROM",
@@ -188,7 +174,7 @@
             "default": true
         }
         ],
-        "path": "PlatformInfo/Generic"
+        "path": "PlatformInfo/Generic/ROM"
     },
     {
         "name": "SystemSerialNumber",
@@ -200,10 +186,9 @@
             "default": true
         }
         ],
-        "path": "PlatformInfo/Generic"
+        "path": "PlatformInfo/Generic/SystemSerialNumber"
     },
     {
-        "name": "SystemUUID",
         "values": [
         {
             "name": "Generic SystemUUID",
@@ -212,7 +197,7 @@
             "default": true
         }
         ],
-        "path": "PlatformInfo/Generic"
+        "path": "PlatformInfo/Generic/SystemUUID"
     }
     ],
     "is_enabled": true
@@ -222,7 +207,6 @@
     "description": "Sets minimal allowed APFS driver date and version to permit any release date and version to load",
     "fields": [
     {
-        "name": "MinDate",
         "values": [
         {
             "name": "MinDate",
@@ -231,10 +215,9 @@
             "default": true
         }
         ],
-        "path": "UEFI/APFS"
+        "path": "UEFI/APFS/MinDate"
     },
     {
-        "name": "MinVersion",
         "values": [
         {
             "name": "MinDate",
@@ -243,7 +226,7 @@
             "default": true
         }
         ],
-        "path": "UEFI/APFS"
+        "path": "UEFI/APFS/MinVersion"
     }
     ],
     "is_enabled": true
@@ -253,7 +236,6 @@
     "description": "Sets two quirks in config.plist to disable Resizable BAR support if it\" disabled in system firmware settings",
     "fields": [
     {
-        "name": "ResizeAppleGpuBars",
         "values": [
         {
             "name": "ResizeAppleGpuBars",
@@ -262,10 +244,9 @@
             "default": true
         }
         ],
-        "path": "Booter/Quirks"
+        "path": "Booter/Quirks/ResizeAppleGpuBars"
     },
     {
-        "name": "ResizeGpuBars",
         "values": [
         {
             "name": "ResizeGpuBars",
@@ -274,7 +255,7 @@
             "default": true
         }
         ],
-        "path": "UEFI/Quirks"
+        "path": "UEFI/Quirks/ResizeGpuBars"
     }
     ],
     "is_enabled": true

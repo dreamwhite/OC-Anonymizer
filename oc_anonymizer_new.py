@@ -75,10 +75,23 @@ class PlistStripper:
     def _print_other_menu_entries(self) -> None:
         print('\n[ ] Q. Quit the program')
         print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist')
+        print('[ ] D. Dump the config to censored_config.plist')
 
+    def _dump(self) -> None:
+        """Saves to a file the newly censored config.plist"""
+
+        with open('censored_config.plist', 'wb') as f:
+            try:
+                plistlib.dump(self.plist, f)
+                print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
+            except (Exception,):
+                print("An error occurred while trying to save the censored config.plist file!")
+
+    def _check_rule_validity(self, rule: dict) -> bool:
+        for key, value in rule.items():
+            
     def _apply_rule(self, rule: dict, plist: dict) -> dict:
         new_config: dict = plist.copy()  # oil
-        current_segment_value: dict = new_config  # first memory reference
 
         for field in rule.get('fields', []):
             rule_path = field.get('path', '')
@@ -86,6 +99,7 @@ class PlistStripper:
             segments: str = rule_path.split('/')
             last_segment: str = segments[-1]
 
+            current_segment_value: dict = new_config  # first memory reference
             for index, segment in enumerate(segments):
                 if index == len(segments) - 1:
                     break  # stop just before we reach the destination to allow key access / mutation later on
@@ -124,32 +138,18 @@ class PlistStripper:
 
     def _grab_user_input(self) -> None:
         while True:
-            user_input: int|str = input('Select an option: ')
+            user_input: int|str = input('\nSelect an option: ')
 
             if user_input.isnumeric():
-                if user_input == '1':
-                    self._delete_misc_blessoverride()
-                elif user_input == '2':
-                    self._reset_misc_boot()
-                elif user_input == '3':
-                    self._reset_misc_debug()
-                elif user_input == '4':
-                    self._delete_misc_entries()
-                elif user_input == '5':
-                    self._reset_misc_security()
-                elif user_input == '6':
-                    self._delete_platforminfo_generic()
-                elif user_input == '7':
-                    self._disable_uefi_apfs()
-                elif user_input == '8':
-                    self._disable_resizable_bar_support()
-            
-                self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: fix when user input is of type str like quit or select config
-    
+                self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
+                _: dict = self._apply_rule(self.rules[int(user_input) - 1], self.plist)
+
             elif user_input.lower() == 'q':
                 self._quit_program()
             elif user_input.lower() == 's':
                 self._grab_plist_file()
+            elif user_input.lower() == 'd':
+                self._dump()
             else:
                 print('Unknown option, retry!')
                 time.sleep(0.5)
@@ -157,15 +157,6 @@ class PlistStripper:
             self._init_sequence()
             
 
-    def _dump(self):
-        """Saves to a file the newly censored config.plist"""
-
-        with open('censored_config.plist', 'wb') as f:
-            try:
-                plistlib.dump(self.plist, f)
-                print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
-            except (Exception,):
-                print("An error occurred while trying to save the censored config.plist file!")
 
 if __name__ == '__main__':
     plist_stripper = PlistStripper()
