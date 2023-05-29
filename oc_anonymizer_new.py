@@ -126,22 +126,26 @@ class PlistStripper:
         while True:
             user_input: int|str = input('Select an option: ')
 
-            if user_input == '1':
-                self._delete_misc_blessoverride()
-            elif user_input == '2':
-                self._reset_misc_boot()
-            elif user_input == '3':
-                self._reset_misc_debug()
-            elif user_input == '4':
-                self._delete_misc_entries()
-            elif user_input == '5':
-                self._reset_misc_security()
-            elif user_input == '6':
-                self._delete_platforminfo_generic()
-            elif user_input == '7':
-                self._disable_uefi_apfs()
-            elif user_input == '8':
-                self._disable_resizable_bar_support()
+            if user_input.isnumeric():
+                if user_input == '1':
+                    self._delete_misc_blessoverride()
+                elif user_input == '2':
+                    self._reset_misc_boot()
+                elif user_input == '3':
+                    self._reset_misc_debug()
+                elif user_input == '4':
+                    self._delete_misc_entries()
+                elif user_input == '5':
+                    self._reset_misc_security()
+                elif user_input == '6':
+                    self._delete_platforminfo_generic()
+                elif user_input == '7':
+                    self._disable_uefi_apfs()
+                elif user_input == '8':
+                    self._disable_resizable_bar_support()
+            
+                self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: fix when user input is of type str like quit or select config
+    
             elif user_input.lower() == 'q':
                 self._quit_program()
             elif user_input.lower() == 's':
@@ -150,7 +154,6 @@ class PlistStripper:
                 print('Unknown option, retry!')
                 time.sleep(0.5)
                 continue
-            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: fix when user input is of type str like quit or select config
             self._init_sequence()
             
 
