@@ -3,23 +3,19 @@
 import datetime
 import json
 import os
+from pathlib import Path
 import plistlib
 import time
 
 class PlistStripper:
-    def __init__(self):
-        self.plist = plistlib.load(open('config.plist', 'rb')) #BUG: should be user defined by using D letter in the shell. Actually keeping it for testing purposes
-        self.rules = json.load(open('rules.json', 'r'))
-        self.selected_config = True if self.plist else False
+    def __init__(self) -> None:
+        self.plist: dict = dict()
+        self.rules: dict = json.load(open('rules.json', 'r'))
+        self.selected_config: bool = False
         self._init_sequence()
         self._grab_user_input()
-        #TODO: convert the next line to a user input, so it can be dinamycally changed
-        
-
-
         # self.dump() options dumps the input config.plist, after applying the selected patches, onto a new censored_config.plist
 
-        # TODO: create a shell-like behaviour where the user has to select the config.plist using S key, by dragging onto the terminal the desired config file.
         # BUG: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
         # BUG: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
         # BUG: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
@@ -44,7 +40,7 @@ class PlistStripper:
         print('www.reddit.com/u/dreamwhite')
         print('www.github.com/dreamwhite\n')
 
-        hr = datetime.datetime.now().time().hour
+        hr: int = datetime.datetime.now().time().hour
         if hr > 3 and hr < 12:
             print('Have a nice morning!\n\n')
         elif hr >= 12 and hr < 17:
@@ -81,14 +77,14 @@ class PlistStripper:
         print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist')
 
     def _apply_rule(self, rule: dict, plist: dict) -> dict:
-        new_config = plist.copy()  # oil
-        current_segment_value = new_config  # first memory reference
+        new_config: dict = plist.copy()  # oil
+        current_segment_value: dict = new_config  # first memory reference
 
         for field in rule.get('fields', []):
             rule_path = field.get('path', '')
 
-            segments = rule_path.split('/')
-            last_segment = segments[-1]
+            segments: str = rule_path.split('/')
+            last_segment: str = segments[-1]
 
             for index, segment in enumerate(segments):
                 if index == len(segments) - 1:
@@ -97,14 +93,14 @@ class PlistStripper:
                 current_segment_value = current_segment_value[segment]  # this should update the variable while keeping the reference
 
             for value in field.get('values', []):
-                default = value.get('default', False)
+                default: bool = value.get('default', False)
 
                 if default:
                     initial_value = current_segment_value.get(last_segment)
-                    new_value = value.get('value', '')
+                    new_value: bool|bytes|dict|int|str = value.get('value', '')
 
-                    initial_type = type(initial_value)
-                    new_type = type(new_value)
+                    initial_type: type = type(initial_value)
+                    new_type: type = type(new_value)
 
                     if initial_value is not None:
                         if initial_type == new_type:
@@ -114,16 +110,21 @@ class PlistStripper:
 
         return new_config
     
-    def _grab_plist_file(self) -> None:
-        # Here I'll write the code for loading the plist file from a user input
-        # plist_path
-        # self.plist = plistlib.load(open(plist_path, 'rb'))
-        self.selected_config = True
+    def _grab_plist_file(self) -> dict:
+
+        user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from macOS terminal, quotes are applied to the user input string
+
+        config_plist: Path = Path(user_input)
+
+        if config_plist.exists():
+            self.selected_config = True
+            self.plist: dict =plistlib.load(open(config_plist, 'rb'))
+
         self._init_sequence()
 
     def _grab_user_input(self) -> None:
         while True:
-            user_input = input('Select an option: ')
+            user_input: int|str = input('Select an option: ')
 
             if user_input == '1':
                 self._delete_misc_blessoverride()
@@ -149,58 +150,9 @@ class PlistStripper:
                 print('Unknown option, retry!')
                 time.sleep(0.5)
                 continue
-            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
+            self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled'] #BUG: fix when user input is of type str like quit or select config
             self._init_sequence()
             
-              
-    def _reset_misc_boot(self) -> None:
-        """ Sets Misc/Boot/LauncherOption to Disabled to avoid registering the launcher option in the firmware
-        preferences for persistence"""
-
-        self.plist['Misc']['Boot']['LauncherOption'] = 'Disabled'
-
-    def _delete_misc_blessoverride(self) -> None:
-        """ Deletes custom BlessOverride entries from config.plist"""
-
-        self.plist['Misc']['BlessOverride'] = []
-
-    def _reset_misc_debug(self) -> None:
-        """ Sets Misc/Debug/Target to 3"""
-
-        self.plist['Misc']['Debug']['Target'] = 3
-
-    def _delete_misc_entries(self) -> None:
-        """ Deletes custom bootloader entries from config.plist"""
-
-        self.plist['Misc']['Entries'] = []
-
-    def _reset_misc_security(self) -> None:
-        """Sets
-            -> Misc/Security/ApECID to 0 to disallow using personalised Apple Secure Boot identifiers (unsupported from
-                Monterey and later)
-            -> Misc/Security/ScanPolicy = 0 to allow OpenCore's operating system detection policy
-            -> Misc/Security/SecureBootModel = Disabled. Disables Apple Secure Boot hardware model to avoid issues during Installation. Re-enable in Post-Install so System Updates work when using an SMBIOS of a Mac model with a T2 Security Chip.
-            -> Misc/Security/Vault = Optional to disable OpenCore's vaulting mechanism
-        """
-
-        self.plist['Misc']['Security']['ApECID'] = 0
-        self.plist['Misc']['Security']['ScanPolicy'] = 0
-        self.plist['Misc']['Security']['SecureBootModel'] = 'Disabled'
-        self.plist['Misc']['Security']['Vault'] = 'Optional'
-
-    def _delete_platforminfo_generic(self) -> None:
-        """Censors several SMBIOS identification fields"""
-
-        self.plist['PlatformInfo']['Generic']['MLB'] = 'XX-CHANGE_ME-XX'
-        self.plist['PlatformInfo']['Generic']['ROM'] = b'\x11"3DUf'
-        self.plist['PlatformInfo']['Generic']['SystemSerialNumber'] = 'XX-CHANGE_ME-XX'
-        self.plist['PlatformInfo']['Generic']['SystemUUID'] = 'XX-CHANGE_ME-XX'
-
-    def _disable_uefi_apfs(self) -> None:
-        """ Sets minimal allowed APFS driver date and version to permit any release date and version to load"""
-
-        self.plist['UEFI']['APFS']['MinDate'] = -1
-        self.plist['UEFI']['APFS']['MinVersion'] = -1
 
     def _dump(self):
         """Saves to a file the newly censored config.plist"""
