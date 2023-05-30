@@ -129,13 +129,13 @@ def check_rule_validity(rule: dict) -> bool:
 
         #Then proceeds checking the type of each field
 
-        for field in [name, description, fields, is_enabled]:
-            if type(field) != str:
-                raise InvalidRuleException(rule, f'Type mismatch at "{schema}" field; Expected {name_schema_type} but got {type(field)}')
+        for field in (name, description, fields, is_enabled):
+            if type(field) != type(rule_schema[field]):
+                raise InvalidRuleException(rule, f'Type mismatch at "{schema}" field; Expected {type(schema)} but got {type(field)}')
 
 
         if fields == list():
-            raise InvalidRuleException(rule, 'The rule doesn\'t contain any field')
+            raise InvalidRuleException(rule, 'The rule doesn\'t contain any valid field')
         
 
 check_rule_validity(rules[0])
