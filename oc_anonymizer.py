@@ -7,10 +7,23 @@ from pathlib import Path
 import plistlib
 import time
 
+class Colors():
+    PURPLE = "\033[95m"
+    BLUE = "\033[94m"
+    CYAN = "\033[96m"
+    GREEN = "\033[92m"
+    YELLOW = "\033[93m"
+    RED = "\033[91m"
+    RESET = "\033[0m"
+    BOLD = "\033[1m"
+    UNDERLINE = "\033[4m"
+    
 class PlistStripper:
     def __init__(self) -> None:
+        self.config_plist: Path = Path()
         self.plist: dict = dict()
         self.rules: dict = json.load(open('rules.json', 'r'))
+        self.enabled_rules = [rule for rule in self.rules if rule['is_enabled']]
         self.selected_config: bool = False
         self._init_sequence()
         self._grab_user_input()
@@ -23,12 +36,12 @@ class PlistStripper:
 
     def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
-        print("""
+        print(f"""{Colors.BLUE}
   ___    ___        ___                   _  _         _               
  / _ \  / __|      /   \ _ _   ___  _ _  | || | _ __  (_) ___ ___  _ _ 
 | (_) || (__       | - || ' \ / _ \| ' \  \_. || '  \ | ||_ // -_)| '_|
  \___/  \___|      |_|_||_||_|\___/|_||_| |__/ |_|_|_||_|/__|\___||_|  
-""")
+{Colors.RESET}""")
               
     
     def _quit_program(self) -> None:
@@ -50,7 +63,7 @@ class PlistStripper:
         else:
             print('Have a nice night!\n\n')
         
-        time.sleep(3)
+        time.sleep(1.5)
         exit(0)
 
     def _clear_screen(self) -> None:
@@ -61,21 +74,35 @@ class PlistStripper:
             self._print_welcome_banner()
             self._print_rules_menu()
             self._print_other_menu_entries()
-    
+            time.sleep(0.5)
+
+    def _rule_validity(rule: dict, plist: dict) -> bool:
+        path = rule.get(path)
+
+    def _run_patches(self) -> None:
+
+        if self.enabled_rules == list(): #If list is empty asks the user to select the required patches
+            print(f'{Colors.RED}No rules are selected! Please select at least one, and then try again.')
+            self._init_sequence()
+        else:
+            for rule in self.enabled_rules:
+                _: dict = self._apply_rule(rule, self.plist)
+
     def _print_rules_menu(self) -> None:
         #TODO: Validate fields from config.plist, inside the _print_options_menu function, so unnecessary patches won't be applied again. Saves up more headache imho
         for rule in self.rules:
             for _,*_ in rule.items():
-                print(f'[{"""#""" if rule["is_enabled"] else " "}] {self.rules.index(rule) + 1}.  {rule["name"]} - {rule["description"]}')
+                print(f'{Colors.YELLOW} {self.rules.index(rule) + 1}) {rule["name"]} {f"{Colors.GREEN}[Enabled]{Colors.RESET}" if rule["is_enabled"] else f"{Colors.RED}[Disabled]{Colors.RESET}"}\n\t- {Colors.BLUE}{rule["description"]}{Colors.RESET}\n')
                 break
 
     def _get_index_of_rule(self, rule: dict) -> int:
         return self.rules.index(rule)
 
     def _print_other_menu_entries(self) -> None:
-        print('\n[ ] Q. Quit the program')
-        print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist')
+        print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist {Colors.CYAN}{f"- {self.config_plist.as_posix()}" if self.selected_config else ""}{Colors.RESET}')
+        print(f'[ ] R. Run the selected patches')
         print('[ ] D. Dump the config to censored_config.plist')
+        print('\n[ ] Q. Quit the program')
 
     def _dump(self) -> None:
         """Saves to a file the newly censored config.plist"""
@@ -83,10 +110,11 @@ class PlistStripper:
         with open('censored_config.plist', 'wb') as f:
             try:
                 plistlib.dump(self.plist, f)
-                print(f"Successfully exported anonymized config.plist to {os.path.realpath(f.name)}")
+                print(f'Successfully exported anonymized config.plist to {os.path.realpath(f.name)}')
             except (Exception,):
-                print("An error occurred while trying to save the censored config.plist file!")
-
+                print('An error occurred while trying to save the censored config.plist file!')
+        
+        self._init_sequence()
     # def _check_rule_validity(self, rule: dict) -> bool:
         # for key, value in rule.items():
             
@@ -128,11 +156,11 @@ class PlistStripper:
 
         user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from macOS terminal, quotes are applied to the user input string
 
-        config_plist: Path = Path(user_input)
+        self.config_plist = Path(user_input)
 
-        if config_plist.exists():
+        if self.config_plist.exists():
             self.selected_config = True
-            self.plist: dict = plistlib.load(open(config_plist, 'rb'))
+            self.plist: dict = plistlib.load(open(self.config_plist, 'rb'))
 
         self._init_sequence()
 
@@ -141,17 +169,27 @@ class PlistStripper:
             user_input: int|str = input('\nSelect an option: ')
 
             if user_input.isnumeric():
-                self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
-                _: dict = self._apply_rule(self.rules[int(user_input) - 1], self.plist)
+                if not self.selected_config:
+                    print('Warning, you must select a config before applying patches')
+                    time.sleep(1)
+                    self._init_sequence()
+                else:    
+                    self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
+                    if not self.rules[int(user_input) - 1]['is_enabled']:
+                        self.enabled_rules.remove(self.rules[int(user_input) - 1])
 
             elif user_input.lower() == 'q':
                 self._quit_program()
 
+            elif user_input.lower() == 'r':
+                self._run_patches()
+
             elif user_input.lower() == 's':
                 self._grab_plist_file()
 
-            elif user_input.lower() == 'd':
-                self._dump()
+            elif user_input.lower() == 'd': # If the user hasn't selected yet the config, it should be asked
+                if self.selected_config:
+                    self._dump()
 
             else:
                 print('Unknown option, retry!')

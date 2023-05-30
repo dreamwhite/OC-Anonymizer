@@ -258,6 +258,6 @@
         "path": "UEFI/Quirks/ResizeGpuBars"
     }
     ],
-    "is_enabled": true
+    "is_enabled": false
 }
 ]
