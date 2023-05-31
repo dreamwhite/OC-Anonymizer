@@ -233,7 +233,7 @@
 },
 {
     "name": "Disable Resizable BAR Support",
-    "description": "Sets two quirks in config.plist to disable Resizable BAR support if it\" disabled in system firmware settings",
+    "description": "Sets two quirks in config.plist to disable Resizable BAR support if it's disabled in system firmware settings",
     "fields": [
     {
         "values": [

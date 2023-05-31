@@ -70,7 +70,7 @@ rules = [
 config_plist = {
     'Misc': {
         'Security': {
-            'ScanPolicy': 6942378921738971,
+            'ScanPolicya': 6942378921738971,
             'ApECID': 1782637812637812,
             'SecureBootModel': 'DIOPORCO',
             'Vault': 'dioporco'
@@ -136,6 +136,22 @@ def check_rule_validity(rule: dict) -> bool:
 
         if fields == list():
             raise InvalidRuleException(rule, 'The rule doesn\'t contain any valid field')
-        
 
-check_rule_validity(rules[0])
+def check_path_existence(rule: dict, config: dict) -> bool:
+    fields: list = rule.get('fields')
+    
+    for field in fields:
+        current_segment: str = config.copy()
+        path = field.get('path')
+        splitted_path = path.split('/')
+
+        for breadcrumb in splitted_path: #walks through each part of the breadcrumb till the end of the full path
+            print(f'Current breadcrumb: {breadcrumb}')
+            if breadcrumb in current_segment.keys():
+                # current_segment = config[breadcrumb]
+                if breadcrumb == splitted_path[-1]: #TODO: here it should check the existence
+                    print(f'found {breadcrumb} in {current_segment}')
+                else:
+                    print(f"KeyError. Expected {breadcrumb} in {splitted_path[:-2]}")
+
+check_path_existence(rules[0], config_plist)

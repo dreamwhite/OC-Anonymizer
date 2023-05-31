@@ -20,19 +20,22 @@ class Colors():
     
 class PlistStripper:
     def __init__(self) -> None:
+
         self.config_plist: Path = Path()
         self.plist: dict = dict()
         self.rules: dict = json.load(open('rules.json', 'r'))
         self.enabled_rules = [rule for rule in self.rules if rule['is_enabled']]
+        self.run_patches: bool = False
+        self.run_patches: bool = False
         self.selected_config: bool = False
+        self.dumped_config: bool = Path('censored_config.plist').exists()
+
         self._init_sequence()
         self._grab_user_input()
-        # self.dump() options dumps the input config.plist, after applying the selected patches, onto a new censored_config.plist
 
         # BUG: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
         # BUG: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
         # BUG: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
-        # TODO: When the user selects the desired policies to apply on the resulting "censored_config.plist", the enabled options should have a green foreground text, while the disabled one a red, or a white foreground text.
 
     def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
@@ -69,11 +72,16 @@ class PlistStripper:
     def _clear_screen(self) -> None:
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    def _init_sequence(self) -> None:
-            self._clear_screen()
-            self._print_welcome_banner()
-            self._print_rules_menu()
-            self._print_other_menu_entries()
+    def _init_sequence(self, clear_screen:bool = True, print_welcome_banner:bool = True, print_rules_menu:bool = True, print_other_menu_entries:bool = True) -> None:
+            if clear_screen:
+                self._clear_screen()
+            if print_welcome_banner:
+                self._print_welcome_banner()
+            if print_rules_menu:
+                self._print_rules_menu()
+            if print_other_menu_entries:
+                self._print_other_menu_entries()
+            
             time.sleep(0.5)
 
     def _rule_validity(rule: dict, plist: dict) -> bool:
@@ -100,21 +108,30 @@ class PlistStripper:
 
     def _print_other_menu_entries(self) -> None:
         print(f'{"[ ]" if not self.selected_config else "[#]"} S. Select the config.plist {Colors.CYAN}{f"- {self.config_plist.as_posix()}" if self.selected_config else ""}{Colors.RESET}')
-        print(f'[ ] R. Run the selected patches')
+        print(f'{"[ ]" if not self.run_patches else "[#]"} R. Run the selected patches')
         print('[ ] D. Dump the config to censored_config.plist')
         print('\n[ ] Q. Quit the program')
 
     def _dump(self) -> None:
         """Saves to a file the newly censored config.plist"""
 
-        with open('censored_config.plist', 'wb') as f:
-            try:
-                plistlib.dump(self.plist, f)
-                print(f'Successfully exported anonymized config.plist to {os.path.realpath(f.name)}')
-            except (Exception,):
-                print('An error occurred while trying to save the censored config.plist file!')
-        
+        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+
+        if self.dumped_config:
+            overwrite_file:str = input(f'{Colors.RED}File already exists! Do you want to overwrite it? [y/N] {Colors.RESET}')
+            if overwrite_file.lower() == 'y':
+                with open('censored_config.plist', 'wb') as f:
+                    try:
+                        plistlib.dump(self.plist, f)
+                        print(f'{Colors.GREEN}Successfully exported anonymized config.plist to {os.path.realpath(f.name)}{Colors.ENDC}')
+                        time.sleep(0.5)
+                    except (Exception,):
+                        print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}')
+            else:
+                pass
+
         self._init_sequence()
+
     # def _check_rule_validity(self, rule: dict) -> bool:
         # for key, value in rule.items():
             
@@ -153,7 +170,7 @@ class PlistStripper:
         return new_config
     
     def _grab_plist_file(self) -> dict:
-
+        self._init_sequence(print_rules_menu=False,print_other_menu_entries=False)
         user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from macOS terminal, quotes are applied to the user input string
 
         self.config_plist = Path(user_input)
@@ -176,7 +193,7 @@ class PlistStripper:
                 else:    
                     self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
                     if not self.rules[int(user_input) - 1]['is_enabled']:
-                        self.enabled_rules.remove(self.rules[int(user_input) - 1])
+                        self.enabled_rules.remove(self.rules[int(user_input) - 1]) #TODO: pretty sure this function won't break, but let's see if it does
 
             elif user_input.lower() == 'q':
                 self._quit_program()
