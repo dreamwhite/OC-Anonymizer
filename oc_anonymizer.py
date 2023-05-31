@@ -28,7 +28,7 @@ class PlistStripper:
         self.run_patches: bool = False
         self.selected_config: bool = False
 
-        self._init_sequence()
+        self._init_sequence(sleep_time=0)
         self._grab_user_input()
 
 
@@ -39,6 +39,7 @@ class PlistStripper:
     # TODO: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
     # TODO: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
     #BUG: When applying PlatformInfo/Generic/ROM rule, bytes-like object cannot be serialized. Therefore implement the following code described here: https://stackoverflow.com/a/40000564
+    
     def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
         print(f"""{Colors.BLUE}
@@ -74,7 +75,7 @@ class PlistStripper:
     def _clear_screen(self) -> None:
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    def _init_sequence(self, clear_screen:bool = True, print_welcome_banner:bool = True, print_rules_menu:bool = True, print_other_menu_entries:bool = True) -> None:
+    def _init_sequence(self, clear_screen:bool = True, print_welcome_banner:bool = True, print_rules_menu:bool = True, print_other_menu_entries:bool = True, sleep_time: int = 0.5) -> None:
             if clear_screen:
                 self._clear_screen()
             if print_welcome_banner:
@@ -84,7 +85,7 @@ class PlistStripper:
             if print_other_menu_entries:
                 self._print_other_menu_entries()
             
-            time.sleep(0.5)
+            time.sleep(sleep_time)
 
     def _rule_validity(rule: dict, plist: dict) -> bool:
         path = rule.get(path)
@@ -93,7 +94,7 @@ class PlistStripper:
 
         if self.enabled_rules == list(): #If list is empty asks the user to select the required patches
             print(f'{Colors.RED}No rules are selected! Please select at least one, and then try again.')
-            self._init_sequence()
+            self._init_sequence(sleep_time=0.3)
         else:
             for rule in self.enabled_rules:
                 _: dict = self._apply_rule(rule, self.plist)
@@ -117,7 +118,7 @@ class PlistStripper:
     def _dump(self) -> None:
         """Saves to a file the newly censored config.plist"""
 
-        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False, sleep_time=0.3)
 
         if self._check_if_output_config_exists():
             overwrite_file:str = input(f'{Colors.RED}File already exists! Do you want to overwrite it? [y/N] {Colors.RESET}')
@@ -125,9 +126,9 @@ class PlistStripper:
                 with open('censored_config.plist', 'wb') as f:
                     try:
                         plistlib.dump(self.plist, f)
-                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False, sleep_time=0)
                         print(f'{Colors.GREEN}Successfully overwritten anonymized config.plist to {os.path.realpath(f.name)}{Colors.RESET}')
-                        time.sleep(1)
+                        self._init_sequence(clear_screen=False, print_welcome_banner=False, print_rules_menu=False, print_other_menu_entries=False)
                     except (Exception,):
                         print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}')
             else:
@@ -136,9 +137,9 @@ class PlistStripper:
             with open('censored_config.plist', 'wb') as f:
                     try:
                         plistlib.dump(self.plist, f)
-                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False, sleep_time=0.3)
                         print(f'{Colors.GREEN}Successfully exported anonymized config.plist to {os.path.realpath(f.name)}{Colors.RESET}')
-                        time.sleep(1)
+                        self._init_sequence(clear_screen=False, print_welcome_banner=False, print_rules_menu=False, print_other_menu_entries=False)
                     except Exception as e:
                         print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}.')
                         input("Exception occurred while trying to save the file")
@@ -183,7 +184,7 @@ class PlistStripper:
         return new_config
     
     def _grab_plist_file(self) -> dict:
-        self._init_sequence(print_rules_menu=False,print_other_menu_entries=False)
+        self._init_sequence(print_rules_menu=False,print_other_menu_entries=False,sleep_time=0)
         user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from VSCode terminal, quotes are applied to the user input string
 
         self.config_plist = Path(user_input)
@@ -201,8 +202,7 @@ class PlistStripper:
             if user_input.isnumeric():
                 if not self.selected_config:
                     print('Warning, you must select a config before applying patches')
-                    time.sleep(1)
-                    self._init_sequence()
+                    self._init_sequence(sleep_time=1)
                 else:    
                     self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
                     if not self.rules[int(user_input) - 1]['is_enabled']:
