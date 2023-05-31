@@ -26,17 +26,19 @@ class PlistStripper:
         self.rules: dict = json.load(open('rules.json', 'r'))
         self.enabled_rules = [rule for rule in self.rules if rule['is_enabled']]
         self.run_patches: bool = False
-        self.run_patches: bool = False
         self.selected_config: bool = False
-        self.dumped_config: bool = Path('censored_config.plist').exists()
 
         self._init_sequence()
         self._grab_user_input()
 
-        # BUG: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
-        # BUG: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
-        # BUG: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
 
+    def _check_if_output_config_exists(self) -> bool:
+        return Path('censored_config.plist').exists()
+
+    # TODO: For each option, in case of older version of OpenCore where some options may be missing (e.g. Resizable BAR Support options), the script will display only the available options (e.g. missing Resizable BAR Support options, therefore "8" won't be selectable and the text will be displayed with a grey foreground text) (use conditionals 'key' in self.plist.keys())
+    # TODO: In case of possible sensitive data (mainly PlatformInfo/Generic settings) a yellow/orange foreground text should be displayed, so the user knows that he's missing these important options.
+    # TODO: When dumping "censored_config.plist", in case possible sensitive data censoring options are left unchecked, a warning message should be displayed, so the user can choose whether to ignore them, and therefore continue dumping, or fix them manually (by displaying a menu like done before).
+    #BUG: When applying PlatformInfo/Generic/ROM rule, bytes-like object cannot be serialized. Therefore implement the following code described here: https://stackoverflow.com/a/40000564
     def _print_welcome_banner(self) -> None:
         """ Prints a welcome banner"""
         print(f"""{Colors.BLUE}
@@ -117,18 +119,29 @@ class PlistStripper:
 
         self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
 
-        if self.dumped_config:
+        if self._check_if_output_config_exists():
             overwrite_file:str = input(f'{Colors.RED}File already exists! Do you want to overwrite it? [y/N] {Colors.RESET}')
             if overwrite_file.lower() == 'y':
                 with open('censored_config.plist', 'wb') as f:
                     try:
                         plistlib.dump(self.plist, f)
-                        print(f'{Colors.GREEN}Successfully exported anonymized config.plist to {os.path.realpath(f.name)}{Colors.ENDC}')
-                        time.sleep(1.5)
+                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+                        print(f'{Colors.GREEN}Successfully overwritten anonymized config.plist to {os.path.realpath(f.name)}{Colors.RESET}')
+                        time.sleep(1)
                     except (Exception,):
                         print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}')
             else:
-                pass
+                self._init_sequence()
+        else:
+            with open('censored_config.plist', 'wb') as f:
+                    try:
+                        plistlib.dump(self.plist, f)
+                        self._init_sequence(print_rules_menu=False, print_other_menu_entries=False)
+                        print(f'{Colors.GREEN}Successfully exported anonymized config.plist to {os.path.realpath(f.name)}{Colors.RESET}')
+                        time.sleep(1)
+                    except Exception as e:
+                        print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}.')
+                        input("Exception occurred while trying to save the file")
 
         self._init_sequence()
 
@@ -171,7 +184,7 @@ class PlistStripper:
     
     def _grab_plist_file(self) -> dict:
         self._init_sequence(print_rules_menu=False,print_other_menu_entries=False)
-        user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from macOS terminal, quotes are applied to the user input string
+        user_input: str = input('Drag your config.plist here: ').replace("'", '') #BUG: When dragging from VSCode terminal, quotes are applied to the user input string
 
         self.config_plist = Path(user_input)
 
@@ -193,7 +206,9 @@ class PlistStripper:
                 else:    
                     self.rules[int(user_input) - 1]['is_enabled'] = not self.rules[int(user_input) - 1]['is_enabled']
                     if not self.rules[int(user_input) - 1]['is_enabled']:
-                        self.enabled_rules.remove(self.rules[int(user_input) - 1]) #TODO: pretty sure this function won't break, but let's see if it does
+                        self.enabled_rules.remove(self.rules[int(user_input) - 1])
+                    else:
+                        self.enabled_rules.append(self.rules[int(user_input) - 1])
 
             elif user_input.lower() == 'q':
                 self._quit_program()
