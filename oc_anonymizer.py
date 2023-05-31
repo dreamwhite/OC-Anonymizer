@@ -124,7 +124,7 @@ class PlistStripper:
                     try:
                         plistlib.dump(self.plist, f)
                         print(f'{Colors.GREEN}Successfully exported anonymized config.plist to {os.path.realpath(f.name)}{Colors.ENDC}')
-                        time.sleep(0.5)
+                        time.sleep(1.5)
                     except (Exception,):
                         print(f'{Colors.YELLOW}An error occurred while trying to save the censored config.plist file!{Colors.RESET}')
             else:
